@@ -5,15 +5,15 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var main;
-(function (main) {
+var medias;
+(function (medias) {
     var Media = (function () {
         function Media(id) {
             this.id = id;
         }
         return Media;
     })();
-    main.Media = Media;
+    medias.Media = Media;
     // Tipo Imagem //
     var Imagem = (function (_super) {
         __extends(Imagem, _super);
@@ -22,9 +22,9 @@ var main;
             _super.call(this, id);
             //desenha a imagem
             this.render = function () {
-                main.ctx.save();
-                main.ctx.drawImage(_this.media, _this.x, _this.y, _this.width, _this.height);
-                main.ctx.restore();
+                ctx.save();
+                ctx.drawImage(_this.media, _this.x, _this.y, _this.width, _this.height);
+                ctx.restore();
             };
             this.x = x;
             this.y = y;
@@ -35,7 +35,7 @@ var main;
         }
         return Imagem;
     })(Media);
-    main.Imagem = Imagem;
+    medias.Imagem = Imagem;
     var ClickableImagem = (function (_super) {
         __extends(ClickableImagem, _super);
         function ClickableImagem(id, source, x, y, width, height) {
@@ -48,12 +48,12 @@ var main;
                 var self = _this;
                 var id = _id;
                 var mouseDown = function (event) {
-                    var x = event.x - main.canvas.offsetLeft;
-                    var y = event.y - main.canvas.offsetTop;
+                    var x = event.x - canvas.offsetLeft;
+                    var y = event.y - canvas.offsetTop;
                     if ((self.x < x) && (x < (self.x + self.width)) &&
                         (self.y < y) && (y < (self.y + self.height)) &&
                         self.compare()) {
-                        var sons = main.book.getPage().getSons();
+                        var sons = book.getPage().getSons();
                         //se a pessoa mandar um array de audios    
                         sons.forEach(function (som) {
                             if (som.getId() === id) {
@@ -62,32 +62,32 @@ var main;
                         });
                     }
                 };
-                main.canvas.addEventListener("mousedown", mouseDown, false);
+                canvas.addEventListener("mousedown", mouseDown, false);
             };
             this.irParaPagina = function (numberPage) {
                 var self = _this;
                 var page = numberPage;
                 function mouseDown() {
-                    if (self.layer === main.book.getPageNumber())
+                    if (self.layer === book.getPageNumber())
                         self.activate = true;
                 }
                 function mouseUp(event) {
-                    var x = event.x - main.canvas.offsetLeft;
-                    var y = event.y - main.canvas.offsetTop;
+                    var x = event.x - canvas.offsetLeft;
+                    var y = event.y - canvas.offsetTop;
                     if ((self.x < x) && (x < (self.x + self.width)) &&
                         (self.y < y) && (y < (self.y + self.height))) {
                         if (self.activate) {
                             self.activate = false;
-                            main.book.changePage(page);
+                            book.changePage(page);
                         }
                     }
                 }
-                main.canvas.addEventListener("mouseup", mouseUp, false);
-                main.canvas.addEventListener("mousedown", mouseDown, false);
+                canvas.addEventListener("mouseup", mouseUp, false);
+                canvas.addEventListener("mousedown", mouseDown, false);
             };
             this.compare = function () {
                 //Se a camada da imagem é igual da página então ela é clicavel
-                if (_this.layer === main.book.getPageNumber()) {
+                if (_this.layer === book.getPageNumber()) {
                     return true;
                 }
                 return false;
@@ -95,6 +95,6 @@ var main;
         }
         return ClickableImagem;
     })(Imagem);
-    main.ClickableImagem = ClickableImagem;
-})(main || (main = {}));
+    medias.ClickableImagem = ClickableImagem;
+})(medias = exports.medias || (exports.medias = {}));
 //# sourceMappingURL=Media.js.map

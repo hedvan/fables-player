@@ -4,8 +4,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 /// <reference path="Media.ts" />
-var main;
-(function (main) {
+var msound;
+(function (msound) {
     // Tipo Som //
     var Sound = (function (_super) {
         __extends(Sound, _super);
@@ -15,8 +15,8 @@ var main;
             this.media = new Audio(source);
         }
         return Sound;
-    })(main.Media);
-    main.Sound = Sound;
+    })(Media);
+    msound.Sound = Sound;
     var BackgroundAudio = (function (_super) {
         __extends(BackgroundAudio, _super);
         function BackgroundAudio(id, source) {
@@ -37,7 +37,7 @@ var main;
         }
         return BackgroundAudio;
     })(Sound);
-    main.BackgroundAudio = BackgroundAudio;
+    msound.BackgroundAudio = BackgroundAudio;
     var ClickAudio = (function (_super) {
         __extends(ClickAudio, _super);
         function ClickAudio(id, source) {
@@ -68,6 +68,6 @@ var main;
         ClickAudio.isPlaying = false;
         return ClickAudio;
     })(Sound);
-    main.ClickAudio = ClickAudio;
-})(main || (main = {}));
+    msound.ClickAudio = ClickAudio;
+})(msound = exports.msound || (exports.msound = {}));
 //# sourceMappingURL=Sound.js.map

@@ -1,6 +1,8 @@
-/// <reference path="Media.ts" />
-var main;
-(function (main) {
+var Media_1 = require("./Media");
+var Imagem = Media_1.medias.Imagem;
+var ClickableImagem = Media_1.medias.ClickableImagem;
+var mpage;
+(function (mpage) {
     var Page = (function () {
         function Page(id) {
             var _this = this;
@@ -14,7 +16,7 @@ var main;
             };
             //seta a camada da imagem e adiciona ao vetor
             this.imagemPush = function (item) {
-                if (item instanceof main.ClickableImagem) {
+                if (item instanceof ClickableImagem) {
                     item.setLayer(_this.id);
                 }
                 _this.imagens.push(item);
@@ -29,6 +31,6 @@ var main;
         }
         return Page;
     })();
-    main.Page = Page;
-})(main || (main = {}));
+    mpage.Page = Page;
+})(mpage = exports.mpage || (exports.mpage = {}));
 //# sourceMappingURL=Page.js.map
