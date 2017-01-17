@@ -42,7 +42,7 @@ class Book {
         var Itens = page.getItens();
         //encerra todos os audios que tiver tocando
         Itens.forEach(elem => {
-            if (elem instanceof ClickAudio) {
+            if (elem instanceof Sound) {
                 elem.EncerrarAudio();
             }
         })
@@ -83,7 +83,7 @@ class Page {
             }
         })
         if (flag) {
-            if (item instanceof Imagem) {
+            if (item instanceof Imagem || item instanceof Animation) {
                 item.setLayer(this.id);
             }
             this.itens.push(item);
@@ -92,9 +92,10 @@ class Page {
     
     public getSom = (spec: string): any => {
         var elem = this.itens;
+  
         for (var i = 0; i < elem.length; i++) {
-            if (elem[i] instanceof ClickAudio &&
-                elem[i].getId() === spec) {
+            console.log(elem[i].getId() === spec);
+            if (elem[i].getId() === spec) {
                 return elem[i];
             }
         }
@@ -159,63 +160,26 @@ class Imagem extends Media {
         this.media.src = value;
     }
 }
-//
-//  IMAGEMCLICAVEL CLASS
-//
 
 //
 //SOUND CLASS
 //
 class Sound extends Media {
+    private static isPlaying: boolean = false;
 
     constructor(id: string, source: string) {
         super(id);
         this.media = new Audio(source);
     }
-
-    public ReproduzirAudio = (): void => { };
-}
-
-class BackgroundAudio extends Sound {
-    private isPlaying: boolean = false;
-
-    constructor(id: string, source: string) {
-        super(id, source);
-    }
-
+    
     public ReproduzirAudio = (): void => {
-        if (this.media.currentTime == 0 && !this.isPlaying) {
-            this.isPlaying = true;
+        if (this.media.currentTime == 0 && !Sound.isPlaying) {
+            Sound.isPlaying = true;
             this.media.play();
         }
 
         if (this.media.ended) {
-            this.isPlaying = false;
-            this.media.currentTime = 0;
-        }
-
-        setInterval(this.ReproduzirAudio, 30, this.media, this.isPlaying);
-    };
-}
-//
-//  ClickAudio CLASS
-//
-class ClickAudio extends Sound {
-    private ImageBind: string;
-    private static isPlaying: boolean = false;
-
-    constructor(id: string, source: string) {
-        super(id, source);
-    }
-
-    public ReproduzirAudio = (): void => {
-        if (this.media.currentTime == 0 && !ClickAudio.isPlaying) {
-            ClickAudio.isPlaying = true;
-            this.media.play();
-        }
-
-        if (this.media.ended) {
-            ClickAudio.isPlaying = false;
+            Sound.isPlaying = false;
             this.media.currentTime = 0;
         }
     };
@@ -223,17 +187,15 @@ class ClickAudio extends Sound {
     public EncerrarAudio = (): void => {
         this.media.pause();
         this.media.currentTime = 0;
-        ClickAudio.isPlaying = false;
+        Sound.isPlaying = false;
     }
 
     public getId = (): any => {
         return this.id;
     }
-
-    public setImageBind = (value: any): void => {
-        this.ImageBind = value;
-    }
 }
+
+
     //
     //LABEL CLASS
     //
@@ -287,6 +249,7 @@ class ClickAudio extends Sound {
         private tickCount = 0;
         private ticksPerFrame = 30;
         private numberOfFrames;
+        private layer;
         public events: Events;
         constructor(id:string, frames: number,x,y,w,h, src: string) {
             super(id);
@@ -297,7 +260,7 @@ class ClickAudio extends Sound {
             this.y = y;
             this.width = w;
             this.height = h;
-            this.events = new Events(this.x, this.y, this.width, this.height);
+            this.events = new Events(x, y, w, h);
         }
 
 
@@ -327,7 +290,10 @@ class ClickAudio extends Sound {
         public setVelocidade = (value: number): void => {
             this.ticksPerFrame = value;
         }
-       
+        
+        public setLayer = (value: any): void => {
+            this.events.setLayer(value);
+        }
     }
     //
     //Events class
@@ -369,7 +335,11 @@ class ClickAudio extends Sound {
                 if ((self.x < x) && (x < (self.x + self.w)) &&
                     (self.y < y) && (y < (self.y + self.h)) &&
                     layer) {
-                    func(value1,value2,value3,value4,value5);
+                    func(value1, value2, value3, value4, value5);
+                } else {
+                    console.log("teste");
+                    console.log((self.x < x) && (x < (self.x + self.w)))
+                    console.log((self.y < y) && (y < (self.y + self.h)))
                 }
             });
 
@@ -537,6 +507,8 @@ class ClickAudio extends Sound {
         var background = new Imagem("bg", "Media/BG.png", 0, 0, 1280, 720);
         page.addElement(background);
 
+        var som1 = new Sound("som", "Media/audio1.mp3");
+        page.addElement(som1);
         var titulo = new Label("titulo","O primeiro cavaleiro", 100, 200);
         titulo.setColor("black");
         titulo.setFont("120px Arial");
@@ -561,9 +533,11 @@ class ClickAudio extends Sound {
 
         var key = new Item(false);//para que a chave se torne um boolean
 
-        var knight = new Animation("knight",10,540,490,100,120, "Media/idle.png");
+        var knight = new Animation("knight", 10, 540, 490, 100, 120, "Media/idle.png");
+
         knight.setVelocidade(4);
         knight.events.aoClicar(actions.exibirMsg, "olá eu sou o primeiro cavleiro");
+        knight.events.aoClicar(actions.tocarAudio,"som");
         page.addElement(knight);
 
         var bush = new Imagem("bush", "Media/bush.png", 300, 560, 73, 46);

@@ -35,7 +35,7 @@ var Book = (function () {
             var Itens = page.getItens();
             //encerra todos os audios que tiver tocando
             Itens.forEach(function (elem) {
-                if (elem instanceof ClickAudio) {
+                if (elem instanceof Sound) {
                     elem.EncerrarAudio();
                 }
             });
@@ -72,7 +72,7 @@ var Page = (function () {
                 }
             });
             if (flag) {
-                if (item instanceof Imagem) {
+                if (item instanceof Imagem || item instanceof Animation) {
                     item.setLayer(_this.id);
                 }
                 _this.itens.push(item);
@@ -81,8 +81,8 @@ var Page = (function () {
         this.getSom = function (spec) {
             var elem = _this.itens;
             for (var i = 0; i < elem.length; i++) {
-                if (elem[i] instanceof ClickAudio &&
-                    elem[i].getId() === spec) {
+                console.log(elem[i].getId() === spec);
+                if (elem[i].getId() === spec) {
                     return elem[i];
                 }
             }
@@ -138,73 +138,36 @@ var Imagem = (function (_super) {
     return Imagem;
 })(Media);
 //
-//  IMAGEMCLICAVEL CLASS
-//
-//
 //SOUND CLASS
 //
 var Sound = (function (_super) {
     __extends(Sound, _super);
     function Sound(id, source) {
+        var _this = this;
         _super.call(this, id);
-        this.ReproduzirAudio = function () { };
-        this.media = new Audio(source);
-    }
-    return Sound;
-})(Media);
-var BackgroundAudio = (function (_super) {
-    __extends(BackgroundAudio, _super);
-    function BackgroundAudio(id, source) {
-        var _this = this;
-        _super.call(this, id, source);
-        this.isPlaying = false;
         this.ReproduzirAudio = function () {
-            if (_this.media.currentTime == 0 && !_this.isPlaying) {
-                _this.isPlaying = true;
+            if (_this.media.currentTime == 0 && !Sound.isPlaying) {
+                Sound.isPlaying = true;
                 _this.media.play();
             }
             if (_this.media.ended) {
-                _this.isPlaying = false;
-                _this.media.currentTime = 0;
-            }
-            setInterval(_this.ReproduzirAudio, 30, _this.media, _this.isPlaying);
-        };
-    }
-    return BackgroundAudio;
-})(Sound);
-//
-//  ClickAudio CLASS
-//
-var ClickAudio = (function (_super) {
-    __extends(ClickAudio, _super);
-    function ClickAudio(id, source) {
-        var _this = this;
-        _super.call(this, id, source);
-        this.ReproduzirAudio = function () {
-            if (_this.media.currentTime == 0 && !ClickAudio.isPlaying) {
-                ClickAudio.isPlaying = true;
-                _this.media.play();
-            }
-            if (_this.media.ended) {
-                ClickAudio.isPlaying = false;
+                Sound.isPlaying = false;
                 _this.media.currentTime = 0;
             }
         };
         this.EncerrarAudio = function () {
             _this.media.pause();
             _this.media.currentTime = 0;
-            ClickAudio.isPlaying = false;
+            Sound.isPlaying = false;
         };
         this.getId = function () {
             return _this.id;
         };
-        this.setImageBind = function (value) {
-            _this.ImageBind = value;
-        };
+        this.media = new Audio(source);
     }
-    ClickAudio.isPlaying = false;
-    return ClickAudio;
-})(Sound);
+    Sound.isPlaying = false;
+    return Sound;
+})(Media);
 //
 //LABEL CLASS
 //
@@ -268,6 +231,9 @@ var Animation = (function (_super) {
         this.setVelocidade = function (value) {
             _this.ticksPerFrame = value;
         };
+        this.setLayer = function (value) {
+            _this.events.setLayer(value);
+        };
         this.media = new Image();
         this.media.src = src;
         this.numberOfFrames = frames;
@@ -275,7 +241,7 @@ var Animation = (function (_super) {
         this.y = y;
         this.width = w;
         this.height = h;
-        this.events = new Events(this.x, this.y, this.width, this.height);
+        this.events = new Events(x, y, w, h);
     }
     return Animation;
 })(Media);
@@ -306,6 +272,11 @@ var Events = (function () {
                     (self.y < y) && (y < (self.y + self.h)) &&
                     layer) {
                     func(value1, value2, value3, value4, value5);
+                }
+                else {
+                    console.log("teste");
+                    console.log((self.x < x) && (x < (self.x + self.w)));
+                    console.log((self.y < y) && (y < (self.y + self.h)));
                 }
             });
             return _this.action;
@@ -454,6 +425,8 @@ function story() {
     var page = new Page(0);
     var background = new Imagem("bg", "Media/BG.png", 0, 0, 1280, 720);
     page.addElement(background);
+    var som1 = new Sound("som", "Media/audio1.mp3");
+    page.addElement(som1);
     var titulo = new Label("titulo", "O primeiro cavaleiro", 100, 200);
     titulo.setColor("black");
     titulo.setFont("120px Arial");
@@ -474,6 +447,7 @@ function story() {
     var knight = new Animation("knight", 10, 540, 490, 100, 120, "Media/idle.png");
     knight.setVelocidade(4);
     knight.events.aoClicar(actions.exibirMsg, "olá eu sou o primeiro cavleiro");
+    knight.events.aoClicar(actions.tocarAudio, "som");
     page.addElement(knight);
     var bush = new Imagem("bush", "Media/bush.png", 300, 560, 73, 46);
     bush.events.aoClicar(actions.mudarValor, key, true);
