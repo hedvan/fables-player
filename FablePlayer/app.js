@@ -46,7 +46,7 @@ var Book = (function () {
         this.currentPage = 0;
     }
     return Book;
-})();
+}());
 var book = new Book(); // variavel do tipo livro
 //
 //PAGE CLASS
@@ -93,7 +93,7 @@ var Page = (function () {
         this.id = id;
     }
     return Page;
-})();
+}());
 //
 //MEDIA CLASS
 //
@@ -106,7 +106,7 @@ var Media = (function () {
         this.id = id;
     }
     return Media;
-})();
+}());
 //
 //Imagem CLASS
 //
@@ -136,7 +136,7 @@ var Imagem = (function (_super) {
         this.events = new Events(x, y, width, height);
     }
     return Imagem;
-})(Media);
+}(Media));
 //
 //SOUND CLASS
 //
@@ -167,7 +167,7 @@ var Sound = (function (_super) {
     }
     Sound.isPlaying = false;
     return Sound;
-})(Media);
+}(Media));
 //
 //LABEL CLASS
 //
@@ -199,7 +199,7 @@ var Label = (function (_super) {
         this.font = value;
     };
     return Label;
-})(Media);
+}(Media));
 //
 //  ANIMATION CLASS
 //
@@ -244,7 +244,7 @@ var Animation = (function (_super) {
         this.events = new Events(x, y, w, h);
     }
     return Animation;
-})(Media);
+}(Media));
 //
 //Events class
 //
@@ -288,7 +288,7 @@ var Events = (function () {
         this.action = new Actions();
     }
     return Events;
-})();
+}());
 var Item = (function () {
     function Item(inicial) {
         var _this = this;
@@ -307,7 +307,7 @@ var Item = (function () {
         this.gettable = inicial;
     }
     return Item;
-})();
+}());
 var Actions = (function () {
     function Actions() {
         this.exibirMsg = function (msg) {
@@ -412,7 +412,7 @@ var Actions = (function () {
         };
     }
     return Actions;
-})();
+}());
 var actions = new Actions();
 window.onload = function () {
     canvas = document.getElementById("myCanvas");

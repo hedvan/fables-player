@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="little_knight.css">
+</head>
+<body>
+<fable>
+    <property name="hasantidote" value="false"></property>
+    <page id="page1" bg-img="../../FablePlayer/Media/BG.png" bg-sound="../../FablePlayer/Media/audio1.mp3">
+        <div class="text" id="title">
+            O pequeno cavaleiro
+        </div>
+        <img src="../../FablePlayer/Media/char1.png" height="707" width="587" top="500" left="200"/>
+        <img src="../../FablePlayer/Media/floor.jpg" height="128" width="896" top="580" left="0"/>
+
+        <img src="../../FablePlayer/Media/block.png" height="438" width="438" left="10" top="100"/>
+        <img src="../../FablePlayer/Media/block.png" height="438" width="438" left="300" top="100"/>
+
+        <agent id="butao" top="" left="">
+            <state>
+                <img src="../../FablePlayer/Media/butao.png" height="46" width="73"/>
+                <on-touch>
+                    <start target="page2"></start>
+                </on-touch>
+            </state>
+        </agent>
+
+        <div>
+            <p>Era uma vez um pequeno cavaleiro que recebeu uma carta de um amigo.</p>
+            <p>Ele ficou muito muito muito surpreso, pois esse amigo tinha sumido a anos.</p>
+            <p>Só que as notícias na carta não eram muito boas. O seu amigo tinha contraido uma doença misteriosa e precisava de ajuda para pegar a cura.</p>
+            <p>O mais rápido que pôde ele foi ao encontro desse amigo.</p>
+        </div>
+    </page>
+    <page id="page2" bg-img="../../FablePlayer/Media/BG.png">
+        <div>
+            <p>Na carta o amigo falou que estava na caverna perto da cidade onde achava que a cura estava.</p>
+            <p>Ao chegar lá o cavaleiro notou que estranhamente a caverna tinha uma porta metálica e que estava trancada.</p>
+            <p>Procurando pistas ele notou uma placa perto da porta.</p>
+        </div>
+        <property name="hasKey" value="false"></property>
+
+
+
+        <agent id="arbusto" top="" left="">
+            <state id="closed">
+                <img src="../../FablePlayer/Media/bush.png" height="46" width="73"/>
+                <on-touch>
+                    <start target="arbusto1#open"></start>
+                </on-touch>
+            </state>
+            <state id="open">
+                <img src="../../FablePlayer/Media/openbush.png" height="46" width="73"/>
+                <agent id="key" top="" left="">
+                    <state>
+                        <img src="../../FablePlayer/Media/block.png" height="438" width="438" left="300" top="100"/>
+                        <on-touch>
+                            <set target="hasKey" value="true"></set>
+                            <stop target="key"></stop>
+                        </on-touch>
+                    </state>
+                </agent>
+            </state>
+        </agent>
+
+        <agent id="arbusto2" top="" left="">
+            <state id="closed">
+                <img src="../../FablePlayer/Media/bush.png" height="46" width="73"/>
+                <on-touch>
+                    <start target="arbusto1#open"></start>
+                </on-touch>
+            </state>
+            <state id="open">
+                <img src="../../FablePlayer/Media/openbush.png" height="46" width="73"/>
+            </state>
+        </agent>
+
+        <agent id="arbusto3" top="" left="">
+            <state id="closed">
+                <img src="../../FablePlayer/Media/bush.png" height="46" width="73"/>
+                <on-touch>
+                    <start target="arbusto1#open"></start>
+                </on-touch>
+            </state>
+            <state id="open">
+                <img src="../../FablePlayer/Media/openbush.png" height="46" width="73"/>
+            </state>
+        </agent>
+
+        <agent id="arbusto4" top="" left="">
+            <state id="closed">
+                <img src="../../FablePlayer/Media/bush.png" height="46" width="73"/>
+                <on-touch>
+                    <start target="arbusto1#open"></start>
+                </on-touch>
+            </state>
+            <state id="open">
+                <img src="../../FablePlayer/Media/openbush.png" height="46" width="73"/>
+            </state>
+        </agent>
+
+        <agent id="placa">
+            <state id="rebolando">
+                <animation dur="0.3" rep="indefined">
+                    <img src="../../FablePlayer/Media/placa.png" height="46" width="73"/>
+                    <img src="../../FablePlayer/Media/placa1.png" height="46" width="73"/>
+                </animation>
+                <on-touch>
+                    <start target="placa#aviso"></start>
+                </on-touch>
+            </state>
+            <state id="aviso">
+                <img src="../../FablePlayer/Media/placa.png" height="46" width="73"/>
+                <div>
+                    A chave está nos arbustos
+                </div>
+                <on-touch>
+                    <start target="placa#aviso"></start>
+                </on-touch>
+            </state>
+        </agent>
+    </page>
+    <page id="page3">
+        <div>
+            <p>Ao entrar na caverna o cavaleiro se encontrou em uma sala com duas portas.</p>
+            <p>A porta da esquerda parece ser um armaze. A sala da direita está trancada com um teclado a o lado pedindo uma senha.</p>
+        </div>
+
+        <property name="portaaberta" value="false"></property>
+
+        <agent id="portaArmazem" top="" left="">
+            <state>
+                <img src="../../FablePlayer/Media/porta.png" height="46" width="73"/>
+                <on-touch>
+                    <start target="armazem"></start>
+                </on-touch>
+            </state>
+        </agent>
+        <agent id="portafinal" top="" left="">
+            <state id="normal">
+                <img src="../../FablePlayer/Media/portaFechada.png" height="46" width="73"/>
+                <on-touch>
+                    <test expr="portaaberta==false">
+                        <start target="portafinal#aviso"></start>
+                    </test>
+                    <test expr="portaaberta==true">
+                        <start target="page4"></start>
+                    </test>
+                </on-touch>
+            </state>
+            <state id="aviso">
+                <div>
+                    A porta está trancada.
+                </div>
+                <img src="../../FablePlayer/Media/portaFechada.png" height="46" width="73"/>
+                <sync delay="3">
+                    <start target="portafinal#normal"></start>
+                </sync>
+            </state>
+        </agent>
+    </page>
+    <page id="armazem">
+        <div>
+            <p>No armazem o cavaleiro encontrou várias caixas.</p>
+            <p>"Talvez eu encontre alguma coisa útil no meio dessa bagunça" ele pensou.</p>
+        </div>
+        <agent id="caixa" top="" left="">
+            <state id="normal">
+                <img src="../../FablePlayer/Media/portaFechada.png" height="46" width="73"/>
+                <on-touch>
+                    <test expr="portaaberta==false">
+                        <start target="portafinal#aviso"></start>
+                    </test>
+                    <test expr="portaaberta==true">
+                        <start target="page4"></start>
+                    </test>
+                </on-touch>
+            </state>
+            <state id="aviso">
+                <div>
+                    A porta está trancada.
+                </div>
+                <img src="../../FablePlayer/Media/portaFechada.png" height="46" width="73"/>
+                <sync delay="3">
+                    <start target="portafinal#normal"></start>
+                </sync>
+            </state>
+        </agent>
+    </page>
+    <page id="page4">
+        <div>
+            <p>Finalmente o pequeno cavaleiro encontra o seu amigo.</p>
+            <p>Mas ele está diferente, parece que não que se aproximar do cavaleiro.</p>
+            <p>"Não se aproxime!" o seu amigo grita.</p>
+            <p>"Eu preciso do antidoto que está no armazem. Não sei quanto tempo mais vou resistir sem o antidoto."</p>
+        </div>
+        <div>Aqui está o antidoto.</div>
+        <div>Irei buscar o antidoto.</div>
+    </page>
+    <page id="fim">
+        <div>
+            <p>O pequeno cavaleiro retorno com seu amigo para botar o papo em dia.</p>
+        </div>
+    </page>
+</fable>
+</body>
+</html>
