@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="fablePlayer">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
     <link rel="stylesheet" href="little_knight.css">
+    <script src="../../src/js/angular.min.js"></script>
+    <link rel="stylesheet" href="../../src/css/fable-player.css">
+    <script src="../../src/app/fable.js"></script>
 </head>
-<body>
-<fable>
+<body ng-controller="fablePlayerController">
+<fable >
     <property name="hasantidote" value="false"></property>
     <page id="page1" bg-img="../../FablePlayer/Media/BG.png" bg-sound="../../FablePlayer/Media/audio1.mp3">
         <div class="text" id="title">

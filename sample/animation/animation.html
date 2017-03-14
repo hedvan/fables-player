@@ -1,16 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="fablePlayer">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-    <script src="../../src/app/fable.ts.js"></script>
+    <title>Animation</title>
+    <script src="../../src/js/angular.min.js"></script>
+    <script src="../../src/app/fablePlayer.js"></script>
+    <script src="../../src/app/animation.js"></script>
+    <link rel="stylesheet" href="../../src/css/fable-player.css">
 </head>
-<body>
+<body ng-controller="fablePlayerController">
+    <animation>
 
-<animation>
-    <img />
+        <img src="../../FablePlayer/Media/bush.png" height="46" width="73"/>
+    </animation>
 
-</animation>
+        <img class="fly" src="../../FablePlayer/Media/bush.png" height="46" width="73"/>
 
 </body>
 </html>
