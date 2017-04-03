@@ -1,36 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="fablePlayer">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" href="little_knight.css">
+    <script src="../../src/js/angular.min.js"></script>
+    <script src="../../src/app/fablePlayer.js"></script>
+    <link rel="stylesheet" href="../../src/css/fable-player.css">
 </head>
-<body>
-<fable>
+<body ng-controller="fablePlayerController">
+<fable width="20" height="40"></fable>
+<fable width="800" height="600" id="aqui">
     <property name="hasantidote" value="false"></property>
     <page id="page1" bg-img="../../FablePlayer/Media/BG.png" bg-sound="../../FablePlayer/Media/audio1.mp3">
-        <div class="text" id="title">
-            O pequeno cavaleiro
-        </div>
-        <img src="../../FablePlayer/Media/char1.png" height="707" width="587" top="500" left="200"/>
-        <img src="../../FablePlayer/Media/floor.jpg" height="128" width="896" top="580" left="0"/>
-
-        <img src="../../FablePlayer/Media/block.png" height="438" width="438" left="10" top="100"/>
-        <img src="../../FablePlayer/Media/block.png" height="438" width="438" left="300" top="100"/>
-
-        <agent id="butao" top="" left="">
+        <div class="text" id="title" width="250" height="50" top="50" left="50">O pequeno Cavaleiro</div>
+        <img src="../../FablePlayer/Media/char1.png" height="180" width="110" bottom="180" left="440"/>
+        <agent id="botao" top="370" right="140" width="105" height="110">
             <state>
-                <img src="../../FablePlayer/Media/butao.png" height="46" width="73"/>
+                <img src="../../FablePlayer/Media/butao.png"/>
                 <on-touch>
-                    <start target="page2"></start>
+                    <emit event="_END_PAGE"/>
                 </on-touch>
             </state>
         </agent>
 
-        <div>
+        <div width="200" height="300" top="100" left="300">
             <p>Era uma vez um pequeno cavaleiro que recebeu uma carta de um amigo.</p>
             <p>Ele ficou muito muito muito surpreso, pois esse amigo tinha sumido a anos.</p>
-            <p>Só que as notícias na carta não eram muito boas. O seu amigo tinha contraido uma doença misteriosa e precisava de ajuda para pegar a cura.</p>
+            <p>Só que as noticias na carta não eram muito boas. O seu amigo tinha contraído uma doença misteriosa e precisava de ajuda para pegar a cura.</p>
             <p>O mais rápido que pôde ele foi ao encontro desse amigo.</p>
         </div>
     </page>
