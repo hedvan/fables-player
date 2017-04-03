@@ -1,0 +1,22 @@
+.red{
+	color: {{cor}};
+}
+
+
+.fly {
+	    animation-name: diagonal-slide;
+	    animation-duration: 5s;
+	    animation-iteration-count: 10;
+	    position: absolute;
+	}
+
+	@keyframes diagonal-slide {
+	    from {
+	        left: 100px;
+	        top: 100px;
+	    }
+	    to {
+	        left: 400px;
+	        top: 400px;
+	    }
+	}
