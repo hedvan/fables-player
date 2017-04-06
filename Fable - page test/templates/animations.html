@@ -1,0 +1,68 @@
+<style>
+	.fly {
+	    animation-name: diagonal-slide;
+	    animation-duration: 5s;
+	    animation-iteration-count: 10;
+	    position: absolute;
+	}
+
+	@keyframes diagonal-slide {
+	    from {
+	        left: {{x}};
+	        top: {{y}};
+	    }
+	    to {
+	        left: {{xmove}};
+	        top: {{ymove}};
+	    }
+	}
+
+	.fly-right {
+	    animation-name: rightslide;
+	    animation-duration: 5s;
+	    animation-iteration-count: 10;
+	    position: absolute;
+	}
+
+	@keyframes rightslide {
+	    from {
+	        left: {{x}};
+	    }
+	    to {
+	        left: {{xmove}};
+	    }
+	}
+
+	.spin {
+		animation-name: spindizzy;
+		animation-duration: 4000ms;
+		animation-iteration-count: infinite;
+		position: absolute;
+		left: {{x}};
+		top: {{y}};
+	}
+
+	@keyframes spindizzy{
+		from{
+			transform: rotate(0deg);
+		}
+		to{
+			transform: rotate(360deg);
+		}
+	}
+
+	.fade-out { opacity: 0; animation: fadeout 2s linear; }
+
+	@keyframes fadeout { 0% {opacity: 1} 100% {opacity: 0} }
+
+	.fade-in {opacity: 1; animation: fadein 2s linear;}
+
+	@keyframes fadein { 0% {opacity: 0} 100% {opacity: 1} }
+
+	#{{id}}{
+		left: {{x}};
+	    top: {{y}};
+	}
+
+</style>
+<div id="{{id}}" class="{{type}}" ng-transclude></div>
