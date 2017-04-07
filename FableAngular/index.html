@@ -9,22 +9,36 @@
 </head>
 <body>
 	<fable width="800px" height="600px">
-			<animation type="fly" id="flame" x="300" y="300" xmove="400" ymove="400">
-				awoeighwoihewoighewoi
-			</animation>
-			<animation type="fade-in" id="nautilus" x="100" y="100" xmove="600" ymove="00">
-				belly of the beat
-			</animation>
-			<figure src="graphics/cat.png" width="200" height="100"></figure>
-			<position teste="1000" top="100" left="100">
-				<img src="graphics/cat/run1.png"></img>
-				<img src="graphics/cat/run2.png"></img>
-				<img src="graphics/cat/run3.png"></img>
-				<img src="graphics/cat/run4.png"></img>
-				<img src="graphics/cat/run5.png"></img>
-				<img src="graphics/cat/run6.png"></img>
-				<img src="graphics/cat/run7.png"></img>
-			</position>
+			<page number="1">
+				<transition type="fade-in" id="nautilus" x="100" y="100" xmove="600" ymove="00">
+					belly of the beat
+				</transition>
+				<transition type="fly" id="flame" x="300" y="300" xmove="400" ymove="400">
+					awoeighwoihewoighewoi
+				</transition>
+			</page>
+			<page number="2">
+				<figure src="graphics/cat.png" width="200" height="100"></figure>
+				<animation speed="100" top="100" left="100">
+					<img src="graphics/cat/run1.png"></img>
+					<img src="graphics/cat/run2.png"></img>
+					<img src="graphics/cat/run3.png"></img>
+					<img src="graphics/cat/run4.png"></img>
+					<img src="graphics/cat/run5.png"></img>
+					<img src="graphics/cat/run6.png"></img>
+					<img src="graphics/cat/run7.png"></img>
+				</animation>
+			</page>
+			<page number="3">
+				<simple-sprite src="graphics/guy.png" 
+					frame-width="184" 
+					frame-height="325" 
+					frames="8" 
+					frames-per-row="8" 
+					repeat="true" 
+					speed="100">
+				</simple-sprite>
+			</page>
 	</fable>
 </body>
 </html>

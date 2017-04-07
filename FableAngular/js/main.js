@@ -9,14 +9,22 @@ app.directive('fable', function() {
         height: '@height'
       },
       link:function(scope,elem,attrs){
-        elem.css('width','attrs.width');
-      }
-      ,
+        var list = elem.find("page");
+        for(var i = 0; i < list.length; i++){
+        	book.addPage({id: list[i].getAttribute("number"), page: list[i]});
+        }
+        book.checkPage();
+        var i = 2;
+        elem.bind('click', function() {
+        	book.changePage(i);
+        	i++;
+        });
+      },
       template: '<div style="width:{{width}}; height:{{height}}; border:1px solid #000" ng-transclude></div>'
   };
 });
 
-app.directive('animation', function() {
+app.directive('transition', function() {
   return {
        restrict: 'E',
        transclude: true,
@@ -39,11 +47,11 @@ app.directive('animation', function() {
           } else {
             style.appendChild(document.createTextNode(css));
           }
-
           head.appendChild(style);
        },
        template: '<div ng-transclude></div>'
   };
+
   function setAnimation(type,id,x,y,xmove,ymove){
     var anim, frames;
     if(type === "fly"){
@@ -60,7 +68,6 @@ app.directive('animation', function() {
       frames ="@keyframes "+"anim"+"-"+id+" { 0% {opacity: 0} 50%{opacity: 0.5} 100% {opacity: 1} }";
     }
 
-    console.log(anim+" "+frames);
     return anim+" "+frames;
   }
 });
@@ -83,9 +90,6 @@ app.directive('figure', function() {
       img.setAttribute("width", attr.height);
       img.setAttribute("alt", attr.id);
       elem.append(img);
-      elem.css({
-
-      })
     },
     template:'<div ng-transclude></div>'
   } 
@@ -101,18 +105,18 @@ app.directive('onTouch', function() {
   };
 });
 
-app.directive('position', function() {
+app.directive('animation', function() {
   return {
        restrict: 'E',
        scope: {
         x: '@x',
         y: '@y' ,
-        teste: '@teste'
+        speed: '@speed'
        },
        link:function(scope,elem,attr,ctrl){
-          //
-          var frames = elem.children();
           
+          var frames = elem.children();
+
           var frameCount = frames.length;
           var i = 0;
           var speed = attr.teste;
@@ -120,14 +124,49 @@ app.directive('position', function() {
           if (speed === 0|| speed === null || speed === undefined)
             speed = 100;
 
-          setInterval(function () { 
-              
+          setInterval(function () {        
               frames[i % frameCount].style.display = "none"; 
               frames[++i % frameCount].style.display = "block";
-              //frames[i % frameCount].style.left = attr.left+'px';
-              //frames[i % frameCount].style.top = attr.top+'px';
-              //frames[i % frameCount].style.position = 'absolute';
+              frames[i % frameCount].style.left = attr.left+'px';
+              frames[i % frameCount].style.top = attr.top+'px';
+              frames[i % frameCount].style.position = 'absolute';
           }, speed);
        }
+  };
+});
+
+//livro que controla tudo
+var book = (function(){
+  var pages = new Array();
+  var currentPage = 1;
+
+  return {
+    addPage: function(page){
+      pages.push(page);
+    },
+    changePage: function(number){
+      if(number <= pages.length){
+      	currentPage = number;
+      	book.checkPage(currentPage);
+      }else{
+      	alert("ultima pagina");
+      }
+    },
+    checkPage: function(){
+    	for(var i = 0; i < pages.length; i++){
+	        if(currentPage == pages[i].id){
+	            pages[i].page.style.display = "block";
+	        }else{
+	            pages[i].page.style.display = "none";
+	        }
+      	}
+    }
+  };
+}());
+
+//diretiva page
+app.directive('page', function(){
+  return{
+    restrict: 'E',
   };
 });
