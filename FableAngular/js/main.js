@@ -9,16 +9,20 @@ app.directive('fable', function() {
         height: '@height'
       },
       link:function(scope,elem,attrs){
+
         var list = elem.find("page");
+
         for(var i = 0; i < list.length; i++){
         	book.addPage({id: list[i].getAttribute("number"), page: list[i]});
         }
         book.checkPage();
         var i = 2;
+        /*
         elem.bind('click', function() {
         	book.changePage(i);
         	i++;
         });
+        */
       },
       template: '<div style="width:{{width}}; height:{{height}}; border:1px solid #000" ng-transclude></div>'
   };
@@ -95,15 +99,29 @@ app.directive('figure', function() {
   } 
 });
 
+
 app.directive('onTouch', function() {
   return {
        restrict: 'E',
-       transclude: true,
-       scope: {
-       },
-       template: '<div ng-transclude></div>'
+       link:function(scope, elem, attr){
+          //identificar o tipo do elemento
+          var childs = elem.children();
+          console.log(childs);
+          var action = childs[0].attributes[0].localName;
+          var element = childs[0].attributes[0].nodeValue;
+          elem.bind('click',function(){
+            console.log("estou funfando");
+            //iniciar uma page
+            if(element.includes("page")){
+              //
+              book.changePage(parseInt(element.slice(4)));
+            }
+
+          })
+       }
   };
 });
+
 
 app.directive('animation', function() {
   return {
@@ -169,4 +187,12 @@ app.directive('page', function(){
   return{
     restrict: 'E',
   };
+});
+
+//diretiva agente
+app.directive('agent', function(){
+  return{
+    restrict: 'E',
+
+  }
 });
