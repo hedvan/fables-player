@@ -1,5 +1,38 @@
 var app = angular.module("FablePlayer",['simple-sprite']);
 
+//Class Book
+var Book =(function(){
+  function Book(){
+    this.pages = new Array();
+    this.currentPage = 1;
+  }
+  Book.prototype.addPage = function(page){
+    this.pages.push(page);
+  }
+  Book.prototype.changePage = function(number){
+    if(number <= this.pages.length){
+      this.currentPage = number;
+      this.checkPage();
+    }else{
+      alert("ultima pagina");
+    }
+  }
+  //muda a visibilidade das páginas
+  Book.prototype.checkPage = function(){
+    for(var i = 0; i < this.pages.length; i++){
+          if(this.currentPage == this.pages[i].id){
+              this.pages[i].page.style.display = "block";
+          }else{
+              this.pages[i].page.style.display = "none";
+          }
+      }
+  }
+  return Book;
+}());
+
+var book =new Book();
+
+//<fable>
 app.directive('fable', function() {
   return {
       restrict: 'E',
@@ -28,6 +61,7 @@ app.directive('fable', function() {
   };
 });
 
+//<transition>
 app.directive('transition', function() {
   return {
        restrict: 'E',
@@ -76,30 +110,7 @@ app.directive('transition', function() {
   }
 });
 
-app.directive('figure', function() {
-  return{
-    restrict: 'E',
-    transclude: true,
-    scope: {
-      src: '@src',
-      width: '@width',
-      height: '@height',
-      x: '@x',
-      y: '@y'
-    },
-    link:function(scope,elem,attr){
-      var img = document.createElement("img");
-      img.setAttribute("src", attr.src);
-      img.setAttribute("height", attr.width);
-      img.setAttribute("width", attr.height);
-      img.setAttribute("alt", attr.id);
-      elem.append(img);
-    },
-    template:'<div ng-transclude></div>'
-  } 
-});
-
-
+//<on-touch>
 app.directive('onTouch', function() {
   return {
        restrict: 'E',
@@ -109,20 +120,30 @@ app.directive('onTouch', function() {
           console.log(childs);
           var action = childs[0].attributes[0].localName;
           var element = childs[0].attributes[0].nodeValue;
+          var touch = new OnTouch(action,element);
+          
           elem.bind('click',function(){
-            console.log("estou funfando");
-            //iniciar uma page
-            if(element.includes("page")){
-              //
-              book.changePage(parseInt(element.slice(4)));
-            }
-
+            touch.start(book);
           })
        }
   };
 });
 
+//Class OnTouch
+var OnTouch =(function(){
+  function OnTouch(action, element){
+    this.action = action;
+    this.element = element;
+  }
+  OnTouch.prototype.start = function(book){
+    if(this.element.includes("page"))
+      book.changePage(parseInt(this.element.slice(4)));
+  }
 
+  return OnTouch;
+}());
+
+//<animation>
 app.directive('animation', function() {
   return {
        restrict: 'E',
@@ -138,58 +159,33 @@ app.directive('animation', function() {
           var frameCount = frames.length;
           var i = 0;
           var speed = attr.teste;
+          var repeat = attr.repeat;
 
           if (speed === 0|| speed === null || speed === undefined)
             speed = 100;
 
-          setInterval(function () {        
+          var interval = setInterval(function () {        
               frames[i % frameCount].style.display = "none"; 
               frames[++i % frameCount].style.display = "block";
               frames[i % frameCount].style.left = attr.left+'px';
               frames[i % frameCount].style.top = attr.top+'px';
               frames[i % frameCount].style.position = 'absolute';
+
+              if(frameCount == i+1 && repeat==="no")
+                clearInterval(interval);
           }, speed);
        }
   };
 });
 
-//livro que controla tudo
-var book = (function(){
-  var pages = new Array();
-  var currentPage = 1;
-
-  return {
-    addPage: function(page){
-      pages.push(page);
-    },
-    changePage: function(number){
-      if(number <= pages.length){
-      	currentPage = number;
-      	book.checkPage(currentPage);
-      }else{
-      	alert("ultima pagina");
-      }
-    },
-    checkPage: function(){
-    	for(var i = 0; i < pages.length; i++){
-	        if(currentPage == pages[i].id){
-	            pages[i].page.style.display = "block";
-	        }else{
-	            pages[i].page.style.display = "none";
-	        }
-      	}
-    }
-  };
-}());
-
-//diretiva page
+//<page>
 app.directive('page', function(){
   return{
     restrict: 'E',
   };
 });
 
-//diretiva agente
+//<agent>
 app.directive('agent', function(){
   return{
     restrict: 'E',
