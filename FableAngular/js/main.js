@@ -1,5 +1,25 @@
 var app = angular.module("FablePlayer",['simple-sprite']);
 
+//Module Elements
+var Elements = (function(){
+  var animations = new Array();
+
+  var getAnimation = function(animation){
+    animations.push(animation);    
+  }
+  var checkAnimation = function(number){
+    for(var i = 0; i < animations.length; i++)
+      if(animations[i].pageId == number){
+        animations[i].start();
+      }
+  }
+
+  return{
+    getAnimation: getAnimation,
+    checkAnimation: checkAnimation
+  }
+}());
+
 //Class Book
 var Book =(function(){
   function Book(){
@@ -17,6 +37,7 @@ var Book =(function(){
       alert("ultima pagina");
     }
   }
+
   //muda a visibilidade das páginas
   Book.prototype.checkPage = function(){
     for(var i = 0; i < this.pages.length; i++){
@@ -25,8 +46,10 @@ var Book =(function(){
           }else{
               this.pages[i].page.style.display = "none";
           }
-      }
+    }
+    Elements.checkAnimation(this.currentPage);
   }
+
   return Book;
 }());
 
@@ -117,7 +140,6 @@ app.directive('onTouch', function() {
        link:function(scope, elem, attr){
           //identificar o tipo do elemento
           var childs = elem.children();
-          console.log(childs);
           var action = childs[0].attributes[0].localName;
           var element = childs[0].attributes[0].nodeValue;
           var touch = new OnTouch(action,element);
@@ -152,31 +174,47 @@ app.directive('animation', function() {
         y: '@y' ,
         speed: '@speed'
        },
-       link:function(scope,elem,attr,ctrl){
-          
+       link:function(scope,elem,attr,ctrl){  
           var frames = elem.children();
-
-          var frameCount = frames.length;
-          var i = 0;
-          var speed = attr.teste;
-          var repeat = attr.repeat;
-
-          if (speed === 0|| speed === null || speed === undefined)
-            speed = 100;
-
-          var interval = setInterval(function () {        
-              frames[i % frameCount].style.display = "none"; 
-              frames[++i % frameCount].style.display = "block";
-              frames[i % frameCount].style.left = attr.left+'px';
-              frames[i % frameCount].style.top = attr.top+'px';
-              frames[i % frameCount].style.position = 'absolute';
-
-              if(frameCount == i+1 && repeat==="no")
-                clearInterval(interval);
-          }, speed);
+          var parent = elem.parent();
+          while(parent[0].localName != "page"){
+            parent = parent.parent();
+          }
+          var pageId = parent[0].attributes[0].nodeValue;
+          var anim = new Animation(frames, frames.length, attr.teste, pageId, attr.left, attr.top);
+          Elements.getAnimation(anim);
        }
   };
 });
+//Class Animation
+var Animation = (function(){
+  function Animation(frames, frameCount, speed, pageId, left, top){
+    this.frames = frames;
+    this.frameCount = frameCount;
+    this.speed = speed;
+    this.pageId = pageId;
+    this.left = left;
+    this.top = top;
+  }
+
+  Animation.prototype.start = function(){
+    var i = 0;
+    var that = this;
+    if (that.speed === 0|| that.speed === null || that.speed === undefined)
+            that.speed = 100;
+
+    var interval = setInterval(function () {        
+              that.frames[i % that.frameCount].style.display = "none"; 
+              that.frames[++i % that.frameCount].style.display = "block";
+              that.frames[i % that.frameCount].style.left = that.left+'px';
+              that.frames[i % that.frameCount].style.top = that.top+'px';
+              that.frames[i % that.frameCount].style.position = 'absolute';
+
+          }, that.speed);
+  }
+
+  return Animation;
+}())
 
 //<page>
 app.directive('page', function(){
