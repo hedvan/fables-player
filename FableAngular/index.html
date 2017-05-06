@@ -16,10 +16,20 @@
 				<transition type="fly" id="flame" x="300" y="300" xmove="400" ymove="400">
 					awoeighwoihewoighewoi
 				</transition>
-				<on-touch>
-					<target start="page2">
-					aaaaaaaaaaaaaaaaaaaaa
-				</on-touch>
+				<agent id="caixa">
+					<state id="esquerda">
+						<on-touch>
+							<img src="graphics/box.png" style="position: absolute; left: 100px; top: 300px"></img>
+							<target start="state#topo">
+						</on-touch>
+					</state>
+					<state id="topo">
+						<on-touch>
+							<img src="graphics/box.png" style="position: absolute; left: 300px; top: 50px"></img>
+							<target start="state#esquerda">
+						</on-touch>
+					</state>
+				</agent>
 			</page>
 			<page number="2">
 				<on-touch>

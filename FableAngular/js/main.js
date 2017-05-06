@@ -3,6 +3,7 @@ var app = angular.module("FablePlayer",['simple-sprite']);
 //Module Elements
 var Elements = (function(){
   var animations = new Array();
+  var agents = new Array();
 
   var getAnimation = function(animation){
     animations.push(animation);    
@@ -13,10 +14,22 @@ var Elements = (function(){
         animations[i].start();
       }
   }
+  var addAgent = function(agent){
+    agents.push(agent);
+  }
 
+  var getAgent = function(id){
+    console.log(agents[0].id);
+    for(var i = 0; i < agents.length; i++)
+      if(agents[i].id == id){
+        return agents[i];
+      }  
+  }
   return{
     getAnimation: getAnimation,
-    checkAnimation: checkAnimation
+    checkAnimation: checkAnimation,
+    addAgent: addAgent,
+    getAgent: getAgent
   }
 }());
 
@@ -68,52 +81,22 @@ app.directive('fable', function() {
 
         var list = elem.find("page");
 
+        //pega todos os elements page e salva em um array
         for(var i = 0; i < list.length; i++){
         	book.addPage({id: list[i].getAttribute("number"), page: list[i]});
         }
+
         book.checkPage();
         var i = 2;
-        /*
-        elem.bind('click', function() {
-        	book.changePage(i);
-        	i++;
-        });
-        */
       },
       template: '<div style="width:{{width}}; height:{{height}}; border:1px solid #000" ng-transclude></div>'
   };
 });
 
-//<transition>
-app.directive('transition', function() {
-  return {
-       restrict: 'E',
-       transclude: true,
-       scope: {
-        id: '@id',
-        type: '@type',
-        x: '@x',
-        y: '@y',
-        xmove: '@xmove',
-        ymove: '@ymove'
-       },
-       link:function(scope, elem, attr){
-          var css = setAnimation(attr.type, attr.id, attr.x, attr.y, attr.xmove, attr.ymove);
-          head = document.head || document.getElementsByTagName('head')[0],
-          style = document.createElement('style');
+//Module Transitions
+var Transitions = (function(){
 
-          style.type = 'text/css';
-          if (style.styleSheet){
-            style.styleSheet.cssText = css;
-          } else {
-            style.appendChild(document.createTextNode(css));
-          }
-          head.appendChild(style);
-       },
-       template: '<div ng-transclude></div>'
-  };
-
-  function setAnimation(type,id,x,y,xmove,ymove){
+  var setAnimation = function(type,id,x,y,xmove,ymove){
     var anim, frames;
     if(type === "fly"){
       anim = '#'+id+"{ animation-name: "+"anim"+"-"+id+"; animation-duration: 5s; animation-iteration-count: 10; position: absolute; }";
@@ -131,6 +114,40 @@ app.directive('transition', function() {
 
     return anim+" "+frames;
   }
+
+  return{
+    setAnimation: setAnimation
+  }
+}());
+
+//<transition>
+app.directive('transition', function() {
+  return {
+       restrict: 'E',
+       transclude: true,
+       scope: {
+        id: '@id',
+        type: '@type',
+        x: '@x',
+        y: '@y',
+        xmove: '@xmove',
+        ymove: '@ymove'
+       },
+       link:function(scope, elem, attr){
+          var css = Transitions.setAnimation(attr.type, attr.id, attr.x, attr.y, attr.xmove, attr.ymove);
+          head = document.head || document.getElementsByTagName('head')[0],
+          style = document.createElement('style');
+
+          style.type = 'text/css';
+          if (style.styleSheet){
+            style.styleSheet.cssText = css;
+          } else {
+            style.appendChild(document.createTextNode(css));
+          }
+          head.appendChild(style);
+       },
+       template: '<div ng-transclude></div>'
+  };
 });
 
 //<on-touch>
@@ -140,26 +157,53 @@ app.directive('onTouch', function() {
        link:function(scope, elem, attr){
           //identificar o tipo do elemento
           var childs = elem.children();
+          var action, element;
+          //
+          var parent = elem.parent();
+          while(parent[0].localName != "agent"){
+            parent = parent.parent();
+          }
+          console.log(parent);
+          //
           var action = childs[0].attributes[0].localName;
-          var element = childs[0].attributes[0].nodeValue;
+          var element = childs[0].attributes[0].value;
+          //garante que na bagunça de tags sempre pegue o target
+          for(var i = 0; i < childs.length; i++){
+            if(childs[i].tagName == "TARGET"){
+              action = childs[i].attributes[0].localName;
+              element = childs[i].attributes[0].value;
+            }
+          }
           var touch = new OnTouch(action,element);
-          
+          touch.setAgent(parent[0].id);
           elem.bind('click',function(){
             touch.start(book);
           })
        }
   };
 });
-
 //Class OnTouch
 var OnTouch =(function(){
   function OnTouch(action, element){
+    this.agent = "";
     this.action = action;
     this.element = element;
   }
   OnTouch.prototype.start = function(book){
-    if(this.element.includes("page"))
+    if(this.element.includes("page")){
       book.changePage(parseInt(this.element.slice(4)));
+    }
+    if(this.element.includes("state")){
+      //peço para Elements o States usando a id do agent
+      console.log(this.agent);
+      var agent = Elements.getAgent(this.agent);
+      console.log(agent);
+      console.log(this.element.slice(6));
+      agent.changeState(this.element.slice(6));
+    }
+  }
+  OnTouch.prototype.setAgent = function(agent){
+    this.agent = agent;
   }
 
   return OnTouch;
@@ -195,6 +239,8 @@ var Animation = (function(){
     this.pageId = pageId;
     this.left = left;
     this.top = top;
+    for(var i = 0; i < frames.length; i++)
+      this.frames[i % this.frameCount].style.display = "none";
   }
 
   Animation.prototype.start = function(){
@@ -227,6 +273,35 @@ app.directive('page', function(){
 app.directive('agent', function(){
   return{
     restrict: 'E',
-
+    link: function(scope, elem, attr, ctrl){
+      //capturar state
+      var states = elem.find("state");
+      var state = new Agent(states, elem, attr.id);
+      for(var i=1;i<states.length;i++){
+        states[i].remove();
+      }
+      Elements.addAgent(state);
+      // salvar agents em elements e identifica-los pelo id
+    }
   }
 });
+//Class States
+var Agent = (function(){
+  function Agent(states, elem, id){
+    this.elem = elem;
+    this.array = states;
+    this.id = id;
+  }
+
+  Agent.prototype.changeState = function(id){
+    
+    for(var i=0; i < this.array.length; i++){
+      if(this.array[i].id == id)
+        this.elem.after(this.array[i]);//coloca no html o trecho
+      else
+        this.array[i].remove();//retira os estados não usados      
+    }
+  }
+
+  return Agent;
+}());
