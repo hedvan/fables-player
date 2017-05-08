@@ -10,6 +10,11 @@
 <body>
 	<fable width="800px" height="600px">
 			<page number="1">
+				<audio>
+					<!--adicionar att action src-->
+					<source src="graphics/montagne.mp3" type="audio/mpeg">
+					<source src="graphics/audio1.mp3" type="audio/mpeg">
+				</audio>
 				<transition type="fade-in" id="nautilus" x="100" y="100" xmove="600" ymove="00">
 					belly of the beat
 				</transition>
@@ -26,7 +31,7 @@
 					<state id="topo">
 						<on-touch>
 							<img src="graphics/box.png" style="position: absolute; left: 300px; top: 50px"></img>
-							<target start="state#esquerda">
+							<target start="page3">
 						</on-touch>
 					</state>
 				</agent>

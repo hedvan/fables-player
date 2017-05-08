@@ -8,22 +8,25 @@ var Elements = (function(){
   var getAnimation = function(animation){
     animations.push(animation);    
   }
+  //Checa quais animações devem ser iniciadas
   var checkAnimation = function(number){
     for(var i = 0; i < animations.length; i++)
       if(animations[i].pageId == number){
         animations[i].start();
       }
   }
+
   var addAgent = function(agent){
     agents.push(agent);
   }
 
+  //Retorna o agente que foi selecionado
   var getAgent = function(id){
-    console.log(agents[0].id);
-    for(var i = 0; i < agents.length; i++)
+    for(var i = 0; i < agents.length; i++){
       if(agents[i].id == id){
         return agents[i];
       }  
+    }
   }
   return{
     getAnimation: getAnimation,
@@ -158,15 +161,15 @@ app.directive('onTouch', function() {
           //identificar o tipo do elemento
           var childs = elem.children();
           var action, element;
-          //
+          //pegando a tag agent
           var parent = elem.parent();
-          while(parent[0].localName != "agent"){
+          while((parent[0].localName != "agent" && parent[0].localName != "page")){
+
             parent = parent.parent();
           }
-          console.log(parent);
-          //
-          var action = childs[0].attributes[0].localName;
-          var element = childs[0].attributes[0].value;
+
+          var action = childs[0].attributes[0].localName;//ação que desejo
+          var element = childs[0].attributes[0].value;//elemento linkado a ela
           //garante que na bagunça de tags sempre pegue o target
           for(var i = 0; i < childs.length; i++){
             if(childs[i].tagName == "TARGET"){
@@ -174,33 +177,43 @@ app.directive('onTouch', function() {
               element = childs[i].attributes[0].value;
             }
           }
-          var touch = new OnTouch(action,element);
-          touch.setAgent(parent[0].id);
-          elem.bind('click',function(){
-            touch.start(book);
-          })
+
+          var touch = new OnTouch(action,element,elem);
+          
+          if(parent[0].localName == "agent"){
+            touch.setAgent(parent[0].id);
+          }
+
+          touch.start(book);
+          
        }
   };
 });
+
 //Class OnTouch
 var OnTouch =(function(){
-  function OnTouch(action, element){
+  function OnTouch(action, element, elem){
     this.agent = "";
     this.action = action;
     this.element = element;
+    this.elem = elem;
   }
-  OnTouch.prototype.start = function(book){
-    if(this.element.includes("page")){
-      book.changePage(parseInt(this.element.slice(4)));
-    }
-    if(this.element.includes("state")){
-      //peço para Elements o States usando a id do agent
-      console.log(this.agent);
-      var agent = Elements.getAgent(this.agent);
-      console.log(agent);
-      console.log(this.element.slice(6));
-      agent.changeState(this.element.slice(6));
-    }
+  OnTouch.prototype.start = function(book1){
+    var that = this;
+    var elements = Elements;
+    that.elem.bind('click',function(){
+      //se o element for uma página ele troca
+      if(that.element.includes("page")){
+        book.changePage(parseInt(that.element.slice(4)));
+      }
+      //se for um state busca o agente 
+      //que ele pertence e muda o estado
+      if(that.element.includes("state")){
+        //peço para Elements o States usando a id do agent
+        var agent = elements.getAgent(that.agent);
+        agent.changeState(that.element.slice(6));
+      }
+    })
   }
   OnTouch.prototype.setAgent = function(agent){
     this.agent = agent;
@@ -230,6 +243,7 @@ app.directive('animation', function() {
        }
   };
 });
+
 //Class Animation
 var Animation = (function(){
   function Animation(frames, frameCount, speed, pageId, left, top){
@@ -285,16 +299,16 @@ app.directive('agent', function(){
     }
   }
 });
-//Class States
+
+//Class Agent
 var Agent = (function(){
   function Agent(states, elem, id){
     this.elem = elem;
     this.array = states;
-    this.id = id;
+    this.id = id; //id do agent
   }
 
   Agent.prototype.changeState = function(id){
-    
     for(var i=0; i < this.array.length; i++){
       if(this.array[i].id == id)
         this.elem.after(this.array[i]);//coloca no html o trecho
@@ -304,4 +318,33 @@ var Agent = (function(){
   }
 
   return Agent;
+}());
+
+//<audio>
+app.directive('audio', function(){
+  return{
+    restrict: 'E',
+    link: function(scope, elem, attr, ctrl){
+      //pegar tag source
+      var sources = elem.find("source");
+      var sound = new Sound(sources,elem);
+      sound.start();
+    }
+  }
+});
+
+//class Audio
+var Sound = (function(){
+  function Sound(sources, elem){
+    this.sources = sources;
+    this.elem = elem;
+  }
+
+  Sound.prototype.start = function(){
+    //pegar o primeiro audio e rodar
+    var audio = new Audio(this.sources[0].src);
+    audio.play();
+  }
+
+  return Sound;
 }());
