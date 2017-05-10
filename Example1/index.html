@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html ng-app="FablePlayer">
+<head>
+	<title>Fable-Player</title>
+	<script type="text/javascript" src="lib/angular.js"></script>
+	<script type="text/javascript" src="lib/angular-simple-sprite.js"></script>
+	<script type="text/javascript" src="js/main.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+<body>
+	<div style="width:1000px;height:1000px;position:fixed;z-index: 100;background-color: red;"></div>
+	<fable width="800px" height="600px" style="width:1000px;height:1000px;position:fixed;z-index: 100">
+			<page id="1" width="800px" height="600px" style="position: absolute;">
+				<img src="graphics/BG.png" width="800px" height="600px" style="position: absolute;"></img>
+				<div class="title" id="title" width="250" height="50" style="position: relative; text-align:center;">O pequeno cavaleiro</div>
+				<!--cavaleiro e historia-->
+				<agent id="inicio">
+					<state id="text1">
+						<on-touch>
+							<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 100px; top: 300px"></img>
+							<target start="state#text2">
+						</on-touch>
+						 <img src="graphics/block.png" style="position: absolute;top: 420px;z-index: -1"></img>	
+						 <div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
+				            <p>Era uma vez um pequeno cavaleiro que recebeu uma carta de um amigo.</p>
+				        </div>
+					</state>
+					<state id="text2">
+						<on-touch>
+							<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 100px; top: 300px"></img>
+							<target start="state#text3">
+						</on-touch>
+						 <div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
+				            <p>Ele ficou muito muito muito surpreso, pois esse amigo tinha sumido a anos.</p>
+				        </div>
+					</state>
+					<state id="text3">
+						<on-touch>
+							<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 100px; top: 300px"></img>
+							<target start="state#text4">
+						</on-touch>
+						 <div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
+				            <p>Só que as noticias na carta não eram muito boas. O seu amigo tinha contraído uma doença misteriosa e precisava de ajuda para pegar a cura.</p>
+				        </div>
+					</state>
+					<state id="text4">
+						<on-touch>
+							<img src="graphics/sign2.png" style="position: absolute; left: 600px; top: 500px;">
+							<target start="page#2">
+						</on-touch>
+						 <img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 100px; top: 300px"></img>
+						 <div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
+				            <p>O mais rápido que pôde ele foi ao encontro desse amigo.</p>
+				        </div>
+					</state>
+				</agent>
+			</page>
+			<page id="2" width="800px" height="600px" style="position: relative;">
+				<on-touch>
+					<target start="page#3">
+					<animation speed="100" top="100" left="100" repeat="yes">
+						<img src="graphics/cat/run1.png"></img>
+						<img src="graphics/cat/run2.png"></img>
+						<img src="graphics/cat/run3.png"></img>
+						<img src="graphics/cat/run4.png"></img>
+						<img src="graphics/cat/run5.png"></img>
+						<img src="graphics/cat/run6.png"></img>
+						<img src="graphics/cat/run7.png"></img>
+					</animation>
+				</on-touch>
+			</page>
+			<page id="3" width="800px" height="600px" style="position: relative;">
+				<simple-sprite src="graphics/guy.png" 
+					frame-width="184" 
+					frame-height="325" 
+					frames="8" 
+					frames-per-row="8" 
+					repeat="true" 
+					speed="100">
+				</simple-sprite>
+			</page>
+	</fable>
+</body>
+</html>

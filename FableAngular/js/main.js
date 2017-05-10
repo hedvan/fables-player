@@ -4,6 +4,7 @@ var app = angular.module("FablePlayer",['simple-sprite']);
 var Elements = (function(){
   var animations = new Array();
   var agents = new Array();
+  var sounds = new Array();
 
   var getAnimation = function(animation){
     animations.push(animation);    
@@ -28,11 +29,26 @@ var Elements = (function(){
       }  
     }
   }
+
+  var addSound = function(sound){
+    sounds.push(sound);
+  }
+
+  var getSound = function(id){
+    for(var i = 0; i < sounds.length; i++){
+      if(sounds[i].id == id){
+        return sounds[i];
+      }
+    }
+  }
+
   return{
     getAnimation: getAnimation,
     checkAnimation: checkAnimation,
     addAgent: addAgent,
-    getAgent: getAgent
+    getAgent: getAgent,
+    addSound: addSound,
+    getSound: getSound
   }
 }());
 
@@ -86,7 +102,7 @@ app.directive('fable', function() {
 
         //pega todos os elements page e salva em um array
         for(var i = 0; i < list.length; i++){
-        	book.addPage({id: list[i].getAttribute("number"), page: list[i]});
+        	book.addPage({id: list[i].id, page: list[i]});
         }
 
         book.checkPage();
@@ -170,15 +186,23 @@ app.directive('onTouch', function() {
 
           var action = childs[0].attributes[0].localName;//ação que desejo
           var element = childs[0].attributes[0].value;//elemento linkado a ela
+          var elementId;
           //garante que na bagunça de tags sempre pegue o target
           for(var i = 0; i < childs.length; i++){
             if(childs[i].tagName == "TARGET"){
               action = childs[i].attributes[0].localName;
-              element = childs[i].attributes[0].value;
+              res = childs[i].attributes[0].value.split("#");
+              element = res[0];
+              elementId= res[1];
             }
           }
 
-          var touch = new OnTouch(action,element,elem);
+          console.log(element+" "+elementId);
+          
+          var res = element.split("#");
+
+          
+          var touch = new OnTouch(action,element, elementId,elem);
           
           if(parent[0].localName == "agent"){
             touch.setAgent(parent[0].id);
@@ -192,26 +216,32 @@ app.directive('onTouch', function() {
 
 //Class OnTouch
 var OnTouch =(function(){
-  function OnTouch(action, element, elem){
+  function OnTouch(action, element,elementId , elem){
     this.agent = "";
     this.action = action;
     this.element = element;
     this.elem = elem;
+    this.elementId = elementId;
   }
   OnTouch.prototype.start = function(book1){
     var that = this;
     var elements = Elements;
     that.elem.bind('click',function(){
       //se o element for uma página ele troca
-      if(that.element.includes("page")){
-        book.changePage(parseInt(that.element.slice(4)));
+      if(that.element == "page"){
+        book.changePage(parseInt(that.elementId));
       }
       //se for um state busca o agente 
       //que ele pertence e muda o estado
-      if(that.element.includes("state")){
+      if(that.element == "state"){
         //peço para Elements o States usando a id do agent
         var agent = elements.getAgent(that.agent);
-        agent.changeState(that.element.slice(6));
+        console.log(that.action);
+        agent.changeState(that.elementId);
+      }
+      if(that.element == "audio"){
+        var audio = Elements.getSound(that.elementId);
+        audio.start();
       }
     })
   }
@@ -237,7 +267,7 @@ app.directive('animation', function() {
           while(parent[0].localName != "page"){
             parent = parent.parent();
           }
-          var pageId = parent[0].attributes[0].nodeValue;
+          var pageId = parent[0].id;
           var anim = new Animation(frames, frames.length, attr.teste, pageId, attr.left, attr.top);
           Elements.getAnimation(anim);
        }
@@ -325,22 +355,25 @@ app.directive('audio', function(){
   return{
     restrict: 'E',
     link: function(scope, elem, attr, ctrl){
+      
+      console.log(elem[0].id);
       //pegar tag source
       var sources = elem.find("source");
-      var sound = new Sound(sources,elem);
-      sound.start();
+      var sound = new Sound(elem[0].id, sources,elem);
+      Elements.addSound(sound);
     }
   }
 });
 
 //class Audio
 var Sound = (function(){
-  function Sound(sources, elem){
+  function Sound(id, sources, elem){
+    this.id = id;
     this.sources = sources;
     this.elem = elem;
   }
 
-  Sound.prototype.start = function(){
+  Sound.prototype.start = function(name){
     //pegar o primeiro audio e rodar
     var audio = new Audio(this.sources[0].src);
     audio.play();

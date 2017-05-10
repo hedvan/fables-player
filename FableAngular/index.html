@@ -9,12 +9,19 @@
 </head>
 <body>
 	<fable width="800px" height="600px">
-			<page number="1">
-				<audio>
-					<!--adicionar att action src-->
-					<source src="graphics/montagne.mp3" type="audio/mpeg">
-					<source src="graphics/audio1.mp3" type="audio/mpeg">
-				</audio>
+			<page id="1">
+				<agent>
+					<state id="inicial">
+						<audio id="teste">
+							<!--adicionar att action src-->
+							<source src="graphics/montagne.mp3" type="audio/mpeg">
+						</audio>
+						<on-touch>
+							<img src="graphics/buttonPlay.png" style="position: absolute; left: 500px; top: 500px"></img>
+							<target start="audio#teste">
+						</on-touch>
+					</state>
+				</agent>
 				<transition type="fade-in" id="nautilus" x="100" y="100" xmove="600" ymove="00">
 					belly of the beat
 				</transition>
@@ -31,14 +38,14 @@
 					<state id="topo">
 						<on-touch>
 							<img src="graphics/box.png" style="position: absolute; left: 300px; top: 50px"></img>
-							<target start="page3">
+							<target start="page#3">
 						</on-touch>
 					</state>
 				</agent>
 			</page>
-			<page number="2">
+			<page id="2">
 				<on-touch>
-					<target start="page3">
+					<target start="page#3">
 					<animation speed="100" top="100" left="100" repeat="yes">
 						<img src="graphics/cat/run1.png"></img>
 						<img src="graphics/cat/run2.png"></img>
@@ -50,7 +57,7 @@
 					</animation>
 				</on-touch>
 			</page>
-			<page number="3">
+			<page id="3">
 				<simple-sprite src="graphics/guy.png" 
 					frame-width="184" 
 					frame-height="325" 
