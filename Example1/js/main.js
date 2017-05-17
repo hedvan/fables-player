@@ -108,7 +108,7 @@ app.directive('fable', function() {
         book.checkPage();
         var i = 2;
       },
-      template: '<div style="width:{{width}}; height:{{height}}; border:1px solid #000" ng-transclude></div>'
+      template: '<div style="width:{{width}}; height:{{height}}" ng-transclude></div>'
   };
 });
 
@@ -310,6 +310,20 @@ var Animation = (function(){
 app.directive('page', function(){
   return{
     restrict: 'E',
+    link: function(scope, elem, attr, ctrl){
+      console.log("aaaaaa");
+      console.log(attr.bgImage);
+
+      var img = document.createElement("img");
+      img.src = attr.bgImage;
+      img.width = parseInt(attr.width);
+      img.height = parseInt(attr.height);
+      img.style.left = 0;
+      img.style.top = 0;
+      img.style.position = "absolute";
+      img.style.zIndex = -1;
+      elem.append(img);
+    }
   };
 });
 

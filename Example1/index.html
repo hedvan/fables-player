@@ -9,11 +9,12 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 <body>
-	<div style="width:1000px;height:1000px;position:fixed;z-index: 100;background-color: red;"></div>
-	<fable width="800px" height="600px" style="width:1000px;height:1000px;position:fixed;z-index: 100">
-			<page id="1" width="800px" height="600px" style="position: absolute;">
-				<img src="graphics/BG.png" width="800px" height="600px" style="position: absolute;"></img>
-				<div class="title" id="title" width="250" height="50" style="position: relative; text-align:center;">O pequeno cavaleiro</div>
+	<div class="top"></div>
+	<div class="left"></div>
+	<div class="right"></div>
+	<fable width="800px" height="600px">
+			<page id="1" width="800px" height="600px" style="position: absolute;" bg-image="graphics/BG.png">
+				<div class="title" id="title" style="position: relative; left:200px; top:50px;">O pequeno cavaleiro</div>
 				<!--cavaleiro e historia-->
 				<agent id="inicio">
 					<state id="text1">
@@ -21,7 +22,6 @@
 							<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 100px; top: 300px"></img>
 							<target start="state#text2">
 						</on-touch>
-						 <img src="graphics/block.png" style="position: absolute;top: 420px;z-index: -1"></img>	
 						 <div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
 				            <p>Era uma vez um pequeno cavaleiro que recebeu uma carta de um amigo.</p>
 				        </div>
@@ -55,31 +55,37 @@
 				        </div>
 					</state>
 				</agent>
+				<img src="graphics/block.png" style="position: absolute; left: 90px; top: 421px"/>
 			</page>
-			<page id="2" width="800px" height="600px" style="position: relative;">
+			<page id="2" width="800px" height="600px" style="position: absolute;" bg-image="graphics/BG.png">
 				<on-touch>
 					<target start="page#3">
 					<animation speed="100" top="100" left="100" repeat="yes">
-						<img src="graphics/cat/run1.png"></img>
-						<img src="graphics/cat/run2.png"></img>
-						<img src="graphics/cat/run3.png"></img>
-						<img src="graphics/cat/run4.png"></img>
-						<img src="graphics/cat/run5.png"></img>
-						<img src="graphics/cat/run6.png"></img>
-						<img src="graphics/cat/run7.png"></img>
+						<img src="graphics/animation-walk/walk1.png"></img>
+						<img src="graphics/animation-walk/walk2.png"></img>
+						<img src="graphics/animation-walk/walk3.png"></img>
+						<img src="graphics/animation-walk/walk4.png"></img>
+						<img src="graphics/animation-walk/walk5.png"></img>
+						<img src="graphics/animation-walk/walk6.png"></img>
+						<img src="graphics/animation-walk/walk7.png"></img>
+						<img src="graphics/animation-walk/walk8.png"></img>
+						<img src="graphics/animation-walk/walk9.png"></img>
+						<img src="graphics/animation-walk/walk10.png"></img>
 					</animation>
 				</on-touch>
 			</page>
 			<page id="3" width="800px" height="600px" style="position: relative;">
-				<simple-sprite src="graphics/guy.png" 
-					frame-width="184" 
-					frame-height="325" 
-					frames="8" 
-					frames-per-row="8" 
+				<simple-sprite src="graphics/attack.png" 
+					frame-width="100" 
+					frame-height="120" 
+					frames="9" 
+					frames-per-row="9" 
 					repeat="true" 
 					speed="100">
 				</simple-sprite>
 			</page>
 	</fable>
+
+	<div class="bottom"></div>
 </body>
 </html>
