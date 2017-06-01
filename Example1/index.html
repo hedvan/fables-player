@@ -16,11 +16,11 @@
 			<page id="1" width="800px" height="600px" style="position: absolute;" bg-image="graphics/BG.png">
 				<div class="title" id="title" style="position: relative; left:200px; top:50px;">O pequeno cavaleiro</div>
 				<!--cavaleiro e historia-->
+				<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 100px; top: 300px"></img>
 				<agent id="inicio">
 					<state id="text1">
 						<on-touch>
-							<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 100px; top: 300px"></img>
-							<target start="state#text2">
+							<target start="inicio#text2">
 						</on-touch>
 						 <div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
 				            <p>Era uma vez um pequeno cavaleiro que recebeu uma carta de um amigo.</p>
@@ -28,8 +28,7 @@
 					</state>
 					<state id="text2">
 						<on-touch>
-							<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 100px; top: 300px"></img>
-							<target start="state#text3">
+							<target start="inicio#text3">
 						</on-touch>
 						 <div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
 				            <p>Ele ficou muito muito muito surpreso, pois esse amigo tinha sumido a anos.</p>
@@ -37,8 +36,7 @@
 					</state>
 					<state id="text3">
 						<on-touch>
-							<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 100px; top: 300px"></img>
-							<target start="state#text4">
+							<target start="inicio#text4">
 						</on-touch>
 						 <div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
 				            <p>Só que as noticias na carta não eram muito boas. O seu amigo tinha contraído uma doença misteriosa e precisava de ajuda para pegar a cura.</p>
@@ -49,7 +47,6 @@
 							<img src="graphics/sign2.png" style="position: absolute; left: 600px; top: 500px;">
 							<target start="page#2">
 						</on-touch>
-						 <img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 100px; top: 300px"></img>
 						 <div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
 				            <p>O mais rápido que pôde ele foi ao encontro desse amigo.</p>
 				        </div>
@@ -57,23 +54,56 @@
 				</agent>
 				<img src="graphics/block.png" style="position: absolute; left: 90px; top: 421px"/>
 			</page>
+			<!--Página 2-->
 			<page id="2" width="800px" height="600px" style="position: absolute;" bg-image="graphics/BG.png">
-				<on-touch>
-					<target start="page#3">
-					<animation speed="100" top="100" left="100" repeat="yes">
-						<img src="graphics/animation-walk/walk1.png"></img>
-						<img src="graphics/animation-walk/walk2.png"></img>
-						<img src="graphics/animation-walk/walk3.png"></img>
-						<img src="graphics/animation-walk/walk4.png"></img>
-						<img src="graphics/animation-walk/walk5.png"></img>
-						<img src="graphics/animation-walk/walk6.png"></img>
-						<img src="graphics/animation-walk/walk7.png"></img>
-						<img src="graphics/animation-walk/walk8.png"></img>
-						<img src="graphics/animation-walk/walk9.png"></img>
-						<img src="graphics/animation-walk/walk10.png"></img>
-					</animation>
-				</on-touch>
+				<property name="hasKey" value="false">
+				<img id="bloco" src="graphics/block.png" style="position: absolute; left: 300px; top: 300px; width: 480px ; height: 500px"/>
+				<img id="floor" src="graphics/block.png" style="position: absolute; left: 0px; top: 550px; width: 800px ; height: 100px"/>
+				<agent id="bush1">
+					<state id="verifica">
+						<img id="um" src="graphics/bush.png" style="position: absolute; left:50px; top:505px"/>
+						<on-touch>
+							<alert>chave encontrada!</alert>
+							<set target="hasKey" value="true">
+							<target start="bush1#verificado">
+						</on-touch>
+					</state>
+					<state id="verificado">
+						<img id="um" src="graphics/bush.png" style="position: absolute; left:50px; top:505px"/>
+						<on-touch>
+							<alert>já olhei</alert>
+						</on-touch>
+					</state>
+				</agent>
+				<agent id="bush2">
+					<state id="verifica">
+						<img id="um" src="graphics/bush.png" style="position: absolute; left:150px; top:505px"/>
+						<on-touch>
+							<alert>não tem nada aqui!</alert>
+							<target start="bush2#verificado">
+						</on-touch>
+					</state>
+					<state id="verificado">
+						<img id="um" src="graphics/bush.png" style="position: absolute; left:150px; top:505px"/>
+						<on-touch>
+							<alert>já olhei</alert>
+						</on-touch>
+					</state>
+				</agent>
+				<agent id="door">
+					<state id="fechada">
+						<img id="porta_fechada" src="graphics/DoorLocked.png" 
+							style="position: absolute; left:400px; top:400px; width: 100px; height:100px"/>
+						<on-touch>
+							<test target="hasKey" value="true">
+								<shout target = "_END_PAGE"/>
+							</test>
+						</on-touch> 
+					</state>
+				</agent>
+
 			</page>
+			<!--Página 3-->
 			<page id="3" width="800px" height="600px" style="position: relative;">
 				<simple-sprite src="graphics/attack.png" 
 					frame-width="100" 

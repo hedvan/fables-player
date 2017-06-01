@@ -10,6 +10,7 @@
 <body>
 	<fable width="800px" height="600px">
 			<page id="1">
+				<property name="hasKey" value="false"></property>
 				<agent>
 					<state id="inicial">
 						<audio id="teste">
@@ -30,15 +31,17 @@
 				</transition>
 				<agent id="caixa">
 					<state id="esquerda">
+						<img src="graphics/box.png" style="position: absolute; left: 100px; top: 300px"></img>
 						<on-touch>
-							<img src="graphics/box.png" style="position: absolute; left: 100px; top: 300px"></img>
-							<target start="state#topo">
+							<target start="caixa#topo">
 						</on-touch>
 					</state>
 					<state id="topo">
+						<img src="graphics/box.png" style="position: absolute; left: 300px; top: 50px"></img>
 						<on-touch>
-							<img src="graphics/box.png" style="position: absolute; left: 300px; top: 50px"></img>
 							<target start="page#3">
+							<set target="hasKey" value="true"></set>
+							<stop target="key"></stop>
 						</on-touch>
 					</state>
 				</agent>
