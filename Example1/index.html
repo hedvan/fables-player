@@ -93,26 +93,67 @@
 				<agent id="door">
 					<state id="fechada">
 						<img id="porta_fechada" src="graphics/DoorLocked.png" 
-							style="position: absolute; left:400px; top:400px; width: 100px; height:100px"/>
+							style="position: absolute; left:400px; top:400px; width: 80px; height:140px"/>
 						<on-touch>
 							<test target="hasKey" value="true">
 								<shout target = "_END_PAGE"/>
 							</test>
 						</on-touch> 
 					</state>
+					<state id="aberta">
+						<img id="porta_fechada" src="graphics/DoorOpen.png" 
+							style="position: absolute; left:400px; top:400px; width: 80px; height:140px"/>
+					</state>
 				</agent>
 
 			</page>
 			<!--Página 3-->
-			<page id="3" width="800px" height="600px" style="position: relative;">
-				<simple-sprite src="graphics/attack.png" 
-					frame-width="100" 
-					frame-height="120" 
-					frames="9" 
-					frames-per-row="9" 
-					repeat="true" 
-					speed="100">
-				</simple-sprite>
+			<page id="3" width="800px" height="600px" style="position: relative;" bg-image="graphics/BGcavern.png">
+				<img id="floor" src="graphics/cavern_floor.png" style="position: absolute; left: 0px; top: 550px; width: 800px ; height: 100px"/>
+				<agent id="inter_cavaleiro">
+					<state id="parado">
+						<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 200px; top: 300px"></img>
+						<on-touch>
+							<target start="inter_cavaleiro#mov">
+						</on-touch>
+					</state>
+					<state id="mov">
+						<simple-sprite style="position: absolute; left: 200px; top: 300px"
+							src="graphics/idle_spritesheet.png" 
+							frame-width="100" 
+							frame-height="130" 
+							frames="5" 
+							frames-per-row="2" 
+							repeat="true" 
+							speed="60">
+						</simple-sprite>
+						<target start="inter_cavaleiro#parado">
+					</state>
+				</agent>
+				<agent id="porta_esquerda">
+					<state>
+						<img id="porta_esquerda" src="graphics/DoorLocked.png" style="position: absolute; left: 50px; top: 400px; width: 80px ; height: 140px"/>
+						<on-touch>
+							<target start="page#4">
+						</on-touch>
+					</state>
+				</agent>
+				<agent id="porta_direita">
+					<state>
+						<img id="porta_esquerda" src="graphics/DoorLocked.png" style="position: absolute; left: 550px; top: 400px; width: 80px ; height: 140px"/>
+						<on-touch>
+							<target start="page#5">
+						</on-touch>
+					</state>
+				</agent>
+			</page>
+			<!--Página 4--Caixas-->
+			<page id="4" width="800px" height="600px" bg-image="graphics/BGcavern.png">
+				
+			</page>
+			<!--Página 5--Saida-->
+			<page id="5" width="800px" height="600px" bg-image="graphics/graveyard.png">
+				
 			</page>
 	</fable>
 

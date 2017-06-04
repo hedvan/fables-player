@@ -377,6 +377,8 @@ app.directive('page', function(){
     restrict: 'E',
     link: function(scope, elem, attr, ctrl){
 
+      elem[0].style.position = "relative";
+
       var img = document.createElement("img");
       img.src = attr.bgImage;
       img.width = parseInt(attr.width);
