@@ -328,12 +328,21 @@ app.directive('animation', function() {
        },
        link:function(scope,elem,attr,ctrl){  
           var frames = elem.children();
+
+          if(attr.width != "" && attr.height != ""){
+            for(var i = 0; i < frames.length; i++){
+              frames[i].style.width = attr.width;
+              frames[i].style.height = attr.height;
+              frames[i].style.left = attr.left;
+              frames[i].style.top = attr.top;
+            }
+          }
           var parent = elem.parent();
           while(parent[0].localName != "page"){
             parent = parent.parent();
           }
           var pageId = parent[0].id;
-          var anim = new Animation(frames, frames.length, attr.teste, pageId, attr.left, attr.top);
+          var anim = new Animation(frames, frames.length, attr.teste, pageId, attr.left, attr.top, attr.repeat);
           Elements.getAnimation(anim);
        }
   };
@@ -341,13 +350,14 @@ app.directive('animation', function() {
 
 //Class Animation
 var Animation = (function(){
-  function Animation(frames, frameCount, speed, pageId, left, top){
+  function Animation(frames, frameCount, speed, pageId, left, top, repeat){
     this.frames = frames;
     this.frameCount = frameCount;
     this.speed = speed;
     this.pageId = pageId;
     this.left = left;
     this.top = top;
+    this.repeat = repeat;
     for(var i = 0; i < frames.length; i++)
       this.frames[i % this.frameCount].style.display = "none";
   }
@@ -364,6 +374,9 @@ var Animation = (function(){
               that.frames[i % that.frameCount].style.left = that.left+'px';
               that.frames[i % that.frameCount].style.top = that.top+'px';
               that.frames[i % that.frameCount].style.position = 'absolute';
+
+              if(i==(that.frames.length-1) && that.repeat == "no")
+                clearInterval(interval);
 
           }, that.speed);
   }
@@ -542,16 +555,35 @@ app.directive('test',function(){
         var property = Elements.getProperty(attr.target);
         //pegar value
         var test_value = attr.value;
-        //comparar
-        if(property.getValue() == test_value){
-        //pegar o shout
+        //pegar shout
         var shout = elem[0].children;
         var shout_target = shout[0].attributes[0].nodeValue;
-        console.log(shout);
-        console.log(shout_target);
-        if(shout_target == "_END_PAGE"){
-            alert("entrei aqui");
-            book.nextPage();
+        //comparar
+        if(property.getValue() == test_value){
+          console.log(shout);
+          console.log(shout_target);
+          if(shout_target == "_END_PAGE"){
+              alert("entrei aqui");
+              book.nextPage();
+            }else{
+            //pegar o shout target e fazer dele o element e elementId
+            console.log("enntrei aquiu")
+            res = shout_target.split('#');
+            var element = res[0];
+            var elementId = res[1];
+
+            //gero a ação de click em todos os elementos contidos no state
+            var state = Elements.searchElement(elem,"state");
+            var touch = new OnTouch("start", element, elementId, elem);
+            console.log("aaaelement: "+element+" elementId: "+elementId);
+            if(element == "page"){
+              console.log("entrei no page");
+              touch.pageStart(elementId, book);
+            }
+            if(Elements.checkAgent(element)){
+              console.log("entrei no agent: ");
+              touch.agentStart(element, elementId);
+            }
           }
         }
       })

@@ -54,9 +54,9 @@
 				</agent>
 				<img src="graphics/block.png" style="position: absolute; left: 90px; top: 421px"/>
 			</page>
-			<!--Página 2-->
+			<!--Página 2--Entrada da Caverna-->
 			<page id="2" width="800px" height="600px" style="position: absolute;" bg-image="graphics/BG.png">
-				<property name="hasKey" value="false">
+				<property name="hasKey" value="true">
 				<img id="bloco" src="graphics/block.png" style="position: absolute; left: 300px; top: 300px; width: 480px ; height: 500px"/>
 				<img id="floor" src="graphics/block.png" style="position: absolute; left: 0px; top: 550px; width: 800px ; height: 100px"/>
 				<agent id="bush1">
@@ -107,18 +107,18 @@
 				</agent>
 
 			</page>
-			<!--Página 3-->
+			<!--Página 3--Caverna-->
 			<page id="3" width="800px" height="600px" style="position: relative;" bg-image="graphics/BGcavern.png">
 				<img id="floor" src="graphics/cavern_floor.png" style="position: absolute; left: 0px; top: 550px; width: 800px ; height: 100px"/>
 				<agent id="inter_cavaleiro">
 					<state id="parado">
-						<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 200px; top: 300px"></img>
+						<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 300px; top: 440px"></img>
 						<on-touch>
 							<target start="inter_cavaleiro#mov">
 						</on-touch>
 					</state>
 					<state id="mov">
-						<simple-sprite style="position: absolute; left: 200px; top: 300px"
+						<simple-sprite style="position: absolute; left: 300px; top: 440px"
 							src="graphics/idle_spritesheet.png" 
 							frame-width="100" 
 							frame-height="130" 
@@ -149,10 +149,117 @@
 			</page>
 			<!--Página 4--Caixas-->
 			<page id="4" width="800px" height="600px" bg-image="graphics/BGcavern.png">
+			<property name="antidote" value="false">
+			<img id="floor" src="graphics/cavern_floor.png" style="position: absolute; left: 0px; top: 550px; width: 800px ; height: 100px"/>
+			<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 200px; top: 430px"/>
+			<agent id="caixa1">
+				<state id="fechada">
+					<img id="caixa" src="graphics/box.png" 
+						style="position: absolute; left: 200px; top: 200px; 
+						width: 120px ; height: 120px">
+					<on-touch>
+						<alert>caixa vazia</alert>
+						<target start="caixa1#aberta">
+					</on-touch>
+				</state>
+				<state id="aberta">
+					<img id="caixa" src="graphics/box.png" 
+						style="position: absolute; left: 200px; top: 200px; 
+						width: 120px ; height: 120px">
+					<on-touch>
+						<alert>já olhei essa caixa</alert>
+					</on-touch>
+				</state>
+			</agent>
+			<agent id="caixa2">
+				<state id="fechada">
+					<img id="caixa" src="graphics/box.png" 
+						style="position: absolute; left: 600px; top: 200px; 
+						width: 120px ; height: 120px">
+					<on-touch>
+						<set target="antidote" value="true">
+						<alert>Você encontrou um elixir da vida!!</alert>
+						<target start="caixa2#aberta">
+					</on-touch>
+				</state>
+				<state id="aberta">
+					<img id="caixa" src="graphics/box.png" 
+						style="position: absolute; left: 600px; top: 200px; 
+						width: 120px ; height: 120px">
+					<on-touch>
+						<alert>já olhei essa caixa</alert>
+					</on-touch>
+				</state>
+			</agent>
+			<agent id="caixa3">
+				<state id="fechada">
+					<img id="caixa" src="graphics/box.png" 
+						style="position: absolute; left: 350px; top: 350px; 
+						width: 120px ; height: 120px">
+					<on-touch>
+						<alert>caixa vazia</alert>
+						<target start="caixa3#aberta">
+					</on-touch>
+				</state>
+				<state id="aberta">
+					<img id="caixa" src="graphics/box.png" 
+						style="position: absolute; left: 350px; top: 350px; 
+						width: 120px ; height: 120px">
+					<on-touch>
+						<alert>já olhei essa caixa</alert>
+					</on-touch>
+				</state>
+			</agent>
+			<agent id="porta_esquerda">
+				<state>
+					<img id="porta_esquerda" src="graphics/DoorOpen.png" style="position: absolute; left: 50px; top: 400px; width: 80px ; height: 140px"/>
+					<on-touch>
+						<target start="page#3">
+					</on-touch>
+				</state>
+			</agent>
 				
 			</page>
 			<!--Página 5--Saida-->
 			<page id="5" width="800px" height="600px" bg-image="graphics/graveyard.png">
+			<img id="floor" src="graphics/futuretile.png" style="position: absolute; left: 0px; top: 550px; width: 800px ; height: 100px"/>
+			<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 200px; top: 430px"/>
+			<agent id="amigo">
+				<state id="parado">
+					<img id="zombie" src="graphics/zombie.png" style="position: absolute; left: 600px; top:430px; width: 100px; height: 130px"/>
+					<on-touch>
+						<test target="antidote" value="true">
+							<shout target="amigo#vivo"/>
+						</test>
+						<test target="antidote" value="false">
+							<shout target="amigo#morto"/>
+						</test>
+					</on-touch> 
+				</state>
+				<!--estado do amigo voltando a vida-->
+				<state id="vivo">
+					<img id="amigo" src="graphics/char2.png" style="position: absolute; left: 600px; top:430px; width: 100px; height: 130px"/>
+					<alert>Obrigado por me salvar primeiro cavaleiro!!</alert>
+				</state>
+				<!--estado do amigo morrendo-->
+				<state id="morto">
+					<alert>Você não pegou o elixir no caminho!!OH NÃO MORRIR!!</alert>
+					<animation speed="10" top="430px" left="600px" repeat="no" width="100px" height="130px" style="left:" >
+						<img src="graphics/animation-dead/dead1.png"></img>
+						<img src="graphics/animation-dead/dead2.png"></img>
+						<img src="graphics/animation-dead/dead3.png"></img>
+						<img src="graphics/animation-dead/dead4.png"></img>
+						<img src="graphics/animation-dead/dead5.png"></img>
+						<img src="graphics/animation-dead/dead6.png"></img>
+						<img src="graphics/animation-dead/dead7.png"></img>
+						<img src="graphics/animation-dead/dead8.png"></img>
+						<img src="graphics/animation-dead/dead9.png"></img>
+						<img src="graphics/animation-dead/dead10.png"></img>
+						<img src="graphics/animation-dead/dead11.png"></img>
+						<img src="graphics/animation-dead/dead12.png"></img>
+					</animation>
+				</state>
+			</agent>
 				
 			</page>
 	</fable>
