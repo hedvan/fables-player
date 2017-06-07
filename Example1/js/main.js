@@ -168,7 +168,11 @@ app.directive('fable', function() {
         book.checkPage();
         var i = 2;
       },
-      template: '<div style="width:{{width}}; height:{{height}}; border:1px solid #000" ng-transclude></div>'
+      template: '<div class="top"></div>'
+                 +'<div class="left"></div>'
+                 +'<div class="right"></div>'
+                 +'<div style="width:{{width}}; height:{{height}}; border:1px solid #000" ng-transclude></div>'
+                 +'<div class="bottom"></div>'
   };
 });
 
@@ -392,15 +396,34 @@ app.directive('page', function(){
 
       elem[0].style.position = "relative";
 
-      var img = document.createElement("img");
-      img.src = attr.bgImage;
-      img.width = parseInt(attr.width);
-      img.height = parseInt(attr.height);
-      img.style.left = 0;
-      img.style.top = 0;
-      img.style.position = "absolute";
-      img.style.zIndex = -1;
-      elem.append(img);
+      //pegar a tag fable
+      var fable_elem = Elements.searchElement(elem, "fable");
+      var fable_atts = fable_elem[0].attributes;//atributos fables
+      var fable_width;//largura fable
+      var fable_height;//altura fable
+      /*garante que o width e height do fable
+      sempre sejam definidos certos*/
+      for(var i = 0; i < fable_atts.length; i++){
+        if(fable_atts[i].nodeName == "width")
+          fable_width = fable_atts[i].nodeValue;
+        if(fable_atts[i].nodeName == "height")
+          fable_height = fable_atts[i].nodeValue;
+      }
+      elem[0].style.width = fable_width;
+      elem[0].style.height = fable_height;
+
+      /*criando background*/
+      if(attr.bgImage != ""){
+        var img = document.createElement("img");
+        img.src = attr.bgImage;
+        img.width = parseInt(fable_width);
+        img.height = parseInt(fable_height);
+        img.style.left = 0;
+        img.style.top = 0;
+        img.style.position = "absolute";
+        img.style.zIndex = -1;
+        elem.append(img);
+      }
 
       book.bgSoundStart(attr.bgSound);
 }

@@ -9,14 +9,11 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 <body>
-	<div class="top"></div>
-	<div class="left"></div>
-	<div class="right"></div>
 	<fable width="800px" height="600px">
-			<page id="1" width="800px" height="600px" style="position: absolute;" bg-image="graphics/BG.png">
+			<page id="1" bg-image="graphics/BG.png">
 				<div class="title" id="title" style="position: relative; left:200px; top:50px;">O pequeno cavaleiro</div>
 				<!--cavaleiro e historia-->
-				<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 100px; top: 300px"></img>
+				<img src="graphics/char1.png" width="100" height="130"  left="100px" style="left: 100px; top: 300px"></img>
 				<agent id="inicio">
 					<state id="text1">
 						<on-touch>
@@ -44,7 +41,7 @@
 					</state>
 					<state id="text4">
 						<on-touch>
-							<img src="graphics/sign2.png" style="position: absolute; left: 600px; top: 500px;">
+							<img src="graphics/sign2.png" style="left: 600px; top: 500px;">
 							<target start="page#2">
 						</on-touch>
 						 <div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
@@ -52,13 +49,13 @@
 				        </div>
 					</state>
 				</agent>
-				<img src="graphics/block.png" style="position: absolute; left: 90px; top: 421px"/>
+				<img src="graphics/block.png" style="left: 90px; top: 421px"/>
 			</page>
 			<!--Página 2--Entrada da Caverna-->
-			<page id="2" width="800px" height="600px" style="position: absolute;" bg-image="graphics/BG.png">
+			<page id="2" bg-image="graphics/BG.png">
 				<property name="hasKey" value="true">
-				<img id="bloco" src="graphics/block.png" style="position: absolute; left: 300px; top: 300px; width: 480px ; height: 500px"/>
-				<img id="floor" src="graphics/block.png" style="position: absolute; left: 0px; top: 550px; width: 800px ; height: 100px"/>
+				<img id="bloco" src="graphics/block.png" style="left: 300px; top: 300px; width: 480px ; height: 500px"/>
+				<img id="floor" src="graphics/block.png" style="left: 0px; top: 550px; width: 800px ; height: 100px"/>
 				<agent id="bush1">
 					<state id="verifica">
 						<img id="um" src="graphics/bush.png" style="position: absolute; left:50px; top:505px"/>
@@ -108,7 +105,7 @@
 
 			</page>
 			<!--Página 3--Caverna-->
-			<page id="3" width="800px" height="600px" style="position: relative;" bg-image="graphics/BGcavern.png">
+			<page id="3"  bg-image="graphics/BGcavern.png">
 				<img id="floor" src="graphics/cavern_floor.png" style="position: absolute; left: 0px; top: 550px; width: 800px ; height: 100px"/>
 				<agent id="inter_cavaleiro">
 					<state id="parado">
@@ -148,7 +145,7 @@
 				</agent>
 			</page>
 			<!--Página 4--Caixas-->
-			<page id="4" width="800px" height="600px" bg-image="graphics/BGcavern.png">
+			<page id="4" bg-image="graphics/BGcavern.png">
 			<property name="antidote" value="false">
 			<img id="floor" src="graphics/cavern_floor.png" style="position: absolute; left: 0px; top: 550px; width: 800px ; height: 100px"/>
 			<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 200px; top: 430px"/>
@@ -221,7 +218,7 @@
 				
 			</page>
 			<!--Página 5--Saida-->
-			<page id="5" width="800px" height="600px" bg-image="graphics/graveyard.png">
+			<page id="5" bg-image="graphics/graveyard.png">
 			<img id="floor" src="graphics/futuretile.png" style="position: absolute; left: 0px; top: 550px; width: 800px ; height: 100px"/>
 			<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 200px; top: 430px"/>
 			<agent id="amigo">
@@ -263,7 +260,5 @@
 				
 			</page>
 	</fable>
-
-	<div class="bottom"></div>
 </body>
 </html>
