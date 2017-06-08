@@ -24,6 +24,7 @@ var Elements = (function(){
     agents.push(agent);
   }
 
+  //retorna o agente indicado pelo id
   var getAgent = function(id){
     for(var i = 0; i < agents.length; i++){
       if(agents[i].id == id)
@@ -103,6 +104,8 @@ var Book =(function(){
   }
   Book.prototype.changePage = function(number){
     if(number <= this.pages.length){
+      var sound = Elements.getSound("bgSound"+this.currentPage);
+      sound.stopSound();
       this.currentPage = number;
       this.checkPage();
     }else{
@@ -119,19 +122,8 @@ var Book =(function(){
               this.pages[i].page.style.display = "none";
           }
     }
-    book.bgSoundStop();
 
     Elements.checkAnimation(this.currentPage);
-  }
-
-  Book.prototype.bgSoundStop = function(){
-    console.log("parei");
-    this.sound.pause();
-  }
-
-  Book.prototype.bgSoundStart = function(src){
-    this.sound = new Audio(src);
-    this.sound.play();
   }
 
   Book.prototype.nextPage = function(){
@@ -413,7 +405,7 @@ app.directive('page', function(){
       elem[0].style.height = fable_height;
 
       /*criando background*/
-      if(attr.bgImage != ""){
+      if(attr.bgImage != undefined){
         var img = document.createElement("img");
         img.src = attr.bgImage;
         img.width = parseInt(fable_width);
@@ -425,7 +417,14 @@ app.directive('page', function(){
         elem.append(img);
       }
 
-      book.bgSoundStart(attr.bgSound);
+      /*criando audio-background*/
+      if(attr.bgSound != undefined){
+        var bgSound = new Sound("bgSound"+attr.id,attr.bgSound, elem);
+        console.log(bgSound);
+        bgSound.start();
+        Elements.addSound(bgSound);
+      }
+      //book.bgSoundStart(attr.bgSound);
 }
   };
 });
@@ -486,16 +485,21 @@ app.directive('audio', function(){
 
 //class Audio
 var Sound = (function(){
-  function Sound(id, sources, elem){
+  function Sound(id, source, elem){
     this.id = id;
-    this.sources = sources;
+    this.source = source;
     this.elem = elem;
+    this.audio = 0;
   }
 
-  Sound.prototype.start = function(name){
+  Sound.prototype.start = function(){
     //pegar o primeiro audio e rodar
-    var audio = new Audio(this.sources[0].src);
-    audio.play();
+    this.audio = new Audio(this.source);
+    this.audio.play();
+  }
+
+  Sound.prototype.stopSound = function(){
+    this.audio.pause();
   }
 
   return Sound;
