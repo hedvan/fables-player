@@ -9,11 +9,12 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 <body>
-	<fable width="800px" height="600px">
-			<page id="1" bg-image="graphics/BG.png" bg-sound="graphics/montagne.mp3">
+	<fable width="800px" height="600px" bg-sound="graphics/montagne.mp3">
+			<page id="1" bg-image="graphics/BG.png">
 				<div class="title" id="title" style="position: relative; left:200px; top:50px;">O pequeno cavaleiro</div>
 				<!--cavaleiro e historia-->
-				<img src="graphics/char1.png" width="100" height="130"  left="100px" style="left: 100px; top: 300px"></img>
+
+				<img src="graphics/char1.png" width="100" height="130" style="left: 100px; top: 300px"></img>
 				<agent id="inicio">
 					<state id="text1">
 						<on-touch>
@@ -53,8 +54,13 @@
 			</page>
 			<!--Página 2--Entrada da Caverna-->
 			<page id="2" bg-image="graphics/BG.png">
-				<property name="hasKey" value="true">
+				<property name="hasKey" value="false">
+				<div style="position: absolute; left: 300px; top: 50px; font-size:30px; width:500px;">
+					<p>Após sete dias e sete noite de viagem, o cavaleiro chegou a caverna.
+					   Agora precisa encontrar a chave da entrada que está escondida na vegetação local.</p>
+				</div>
 				<img id="bloco" src="graphics/block.png" style="left: 300px; top: 300px; width: 480px ; height: 500px"/>
+				<img src="graphics/char1.png" width="100" height="130" style="left: 100px; top: 430px"></img>
 				<img id="floor" src="graphics/block.png" style="left: 0px; top: 550px; width: 800px ; height: 100px"/>
 				<agent id="bush1">
 					<state id="verifica">
@@ -107,6 +113,10 @@
 			<!--Página 3--Caverna-->
 			<page id="3"  bg-image="graphics/BGcavern.png">
 				<img id="floor" src="graphics/cavern_floor.png" style="position: absolute; left: 0px; top: 550px; width: 800px ; height: 100px"/>
+				<board set-class="classic-board" font-size="20px" left="100px" top="100px" color="white">
+					Ao entra na caverno o cavaleiro avista duas portas uma a esquerda que parece dar em um caminho sem saida e outra
+					com um foco de luz bem baixo.
+				</board>
 				<agent id="inter_cavaleiro">
 					<state id="parado">
 						<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 300px; top: 440px"></img>
@@ -146,6 +156,9 @@
 			</page>
 			<!--Página 4--Caixas-->
 			<page id="4" bg-image="graphics/BGcavern.png">
+			<board set-class="classic-board" left="130px" top="80px" color="white">
+					Um armazém cheio de caixas o que será que tem dentro delas?(clique nas caixas para vasculha-las.)
+			</board>
 			<property name="antidote" value="false">
 			<img id="floor" src="graphics/cavern_floor.png" style="position: absolute; left: 0px; top: 550px; width: 800px ; height: 100px"/>
 			<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 200px; top: 430px"/>
@@ -223,6 +236,9 @@
 			<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 200px; top: 430px"/>
 			<agent id="amigo">
 				<state id="parado">
+					<board set-class="classic-board" font-size="30px" left="200px" top="100px" color="white">
+						Clique no zombie para ver o que acontece.
+					</board>
 					<img id="zombie" src="graphics/zombie.png" style="position: absolute; left: 600px; top:430px; width: 100px; height: 130px"/>
 					<on-touch>
 						<test target="antidote" value="true">
@@ -236,11 +252,15 @@
 				<!--estado do amigo voltando a vida-->
 				<state id="vivo">
 					<img id="amigo" src="graphics/char2.png" style="position: absolute; left: 600px; top:430px; width: 100px; height: 130px"/>
-					<alert>Obrigado por me salvar primeiro cavaleiro!!</alert>
+					<board set-class="classic-board" width="400px" height="200px" left="200px" top="100px" color="white">
+						Você me salvou primeiro cavaleiro!! Obrigado!!
+					</board>
 				</state>
 				<!--estado do amigo morrendo-->
 				<state id="morto">
-					<alert>Você não pegou o elixir no caminho!!OH NÃO MORRIR!!</alert>
+					<board set-class="classic-board" width="400px" height="200px" left="200px" top="100px" color="white">
+						Oh não você esqueceu o elixir!! Morrir!!
+					</board>
 					<animation speed="10" top="430px" left="600px" repeat="no" width="100px" height="130px" style="left:" >
 						<img src="graphics/animation-dead/dead1.png"></img>
 						<img src="graphics/animation-dead/dead2.png"></img>

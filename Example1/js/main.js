@@ -105,7 +105,8 @@ var Book =(function(){
   Book.prototype.changePage = function(number){
     if(number <= this.pages.length){
       var sound = Elements.getSound("bgSound"+this.currentPage);
-      sound.stopSound();
+      if(sound != undefined)
+        sound.stopSound();
       this.currentPage = number;
       this.checkPage();
     }else{
@@ -148,17 +149,21 @@ app.directive('fable', function() {
         width: '@width',
         height: '@height'
       },
-      link:function(scope,elem,attrs){
+      link:function(scope,elem,attr){
 
         var list = elem.find("page");
-
         //pega todos os elements page e salva em um array
         for(var i = 0; i < list.length; i++){
         	book.addPage({id: list[i].id, page: list[i]});
         }
-
         book.checkPage();
-        var i = 2;
+
+        /*Criando audio background para todas as páginas*/
+        if(attr.bgSound != undefined){
+          var bgSound = new Sound("bgSound"+attr.id,attr.bgSound, elem);
+          bgSound.start();
+          Elements.addSound(bgSound);
+        }
       },
       template: '<div class="top"></div>'
                  +'<div class="left"></div>'
@@ -397,9 +402,9 @@ app.directive('page', function(){
       sempre sejam definidos certos*/
       for(var i = 0; i < fable_atts.length; i++){
         if(fable_atts[i].nodeName == "width")
-          fable_width = fable_atts[i].nodeValue;
+          fable_width = fable_atts[i].value;
         if(fable_atts[i].nodeName == "height")
-          fable_height = fable_atts[i].nodeValue;
+          fable_height = fable_atts[i].value;
       }
       elem[0].style.width = fable_width;
       elem[0].style.height = fable_height;
@@ -420,7 +425,6 @@ app.directive('page', function(){
       /*criando audio-background*/
       if(attr.bgSound != undefined){
         var bgSound = new Sound("bgSound"+attr.id,attr.bgSound, elem);
-        console.log(bgSound);
         bgSound.start();
         Elements.addSound(bgSound);
       }
@@ -559,10 +563,11 @@ app.directive('alert',function(){
     restrict: 'E',
     link: function(scope, elem, attr, ctrl){
        elem[0].style.display = "none";
-
+       var text = String(elem[0].innerHTML);
        var state = Elements.searchElement(elem,"state");
        state.bind('click',function(){
-        alert(elem[0].outerText);
+        alert(text);
+
        })
        
     }
@@ -619,6 +624,7 @@ app.directive('test',function(){
   }
 })
 
+
 //<set>
 app.directive('set',function(){
   return{
@@ -635,6 +641,36 @@ app.directive('set',function(){
         console.log("troquei");
         property.setValue(new_value);
       })
+    }
+  }
+})
+
+//<board>
+app.directive('board',function(){
+  return{
+    restrict: 'E',
+    link: function(scope, elem, attr, ctrl){
+      //escondendo elemento html
+      var text = elem[0].innerHTML;
+      elem[0].innerHTML = "";
+      //criando quadro;
+      var div = document.createElement("div");
+      div.style.position = "absolute";
+      div.style.left = attr.left;
+      div.style.top = attr.top;
+      div.style.width = "300px";
+      div.style.fontSize = attr.fontSize;
+      div.style.textAlign = "justify";
+
+      div.className = attr.setClass;
+      if(attr.fontColor == undefined)
+        div.style.color = "black";
+      else
+        div.style.color = attr.fontColor;
+      
+      div.innerHTML = text;
+
+      elem[0].appendChild(div);
     }
   }
 })

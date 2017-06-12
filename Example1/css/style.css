@@ -22,7 +22,7 @@
 
 .left{
 	position: relative;
-	height: 600px;
+	height: 100%;
 	float: left;
 	background-color: white;
 	border-style: none solid none none;
@@ -32,7 +32,7 @@
 .right{
 	position: relative;
 	width: 532px;
-	height: 600px;
+	height: 100%;
 	background-color: white;
 	float: right;
 	border-style: none none none solid;
@@ -40,8 +40,10 @@
 }
 
 img{
-	position:absolute;
-	left: attr(x);
+	position: absolute;
 }
 
-
+.classic-board{
+    background: white;
+    color: red;
+}
