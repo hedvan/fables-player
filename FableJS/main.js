@@ -650,27 +650,19 @@ app.directive('board',function(){
   return{
     restrict: 'E',
     link: function(scope, elem, attr, ctrl){
-      //escondendo elemento html
-      var text = elem[0].innerHTML;
-      elem[0].innerHTML = "";
-      //criando quadro;
-      var div = document.createElement("div");
-      div.style.position = "absolute";
-      div.style.left = attr.left;
-      div.style.top = attr.top;
-      div.style.width = "300px";
-      div.style.fontSize = attr.fontSize;
-      div.style.textAlign = "justify";
-
-      div.className = attr.setClass;
-      if(attr.fontColor == undefined)
-        div.style.color = "black";
-      else
-        div.style.color = attr.fontColor;
-      
-      div.innerHTML = text;
-
-      elem[0].appendChild(div);
+      //estilização da board
+      elem.css({
+        position: 'absolute',
+        border: '1px solid red',
+        background: 'green', 
+        'border-radius': '10px',
+        'font-size': attr.fontSize,
+        padding: '5px',
+        'text-align': 'justify',
+        left:'200px',
+        top:'200px',
+        width:'300px',
+      })
     }
   }
 })
@@ -682,7 +674,7 @@ app.directive('draggable', ['$document', function($document) {
       var startX = 0, startY = 0, x = 0, y = 0;
 
       element.css({
-       position: 'relative',
+       position: 'absolute',
        border: '1px solid red',
        backgroundColor: 'lightgrey',
        cursor: 'pointer'
