@@ -257,9 +257,8 @@ app.directive('onTouch', function() {
           }
 
           //gero a ação de click em todos os elementos contidos no state
-          var state = Elements.searchElement(elem,"state");
           var touch = new OnTouch(action, element, elementId, elem);
-          state.bind('click',function(){
+          elem.bind('click',function(){
             console.log("element: "+element+" elementId: "+elementId);
             if(element == "page"){
               console.log("entrei no page");
@@ -651,16 +650,23 @@ app.directive('board',function(){
     restrict: 'E',
     link: function(scope, elem, attr, ctrl){
       //estilização da board
+      var left = attr.left;
+      if(left == undefined)
+        left = "10px";
+      var top = attr.top;
+      if(top == undefined)
+        top = "10px";
+      if(attr.fontSize == undefined)
+        attr.fontSize = "25px";
       elem.css({
         position: 'absolute',
-        border: '1px solid red',
-        background: 'green', 
+        background: attr.color, 
         'border-radius': '10px',
         'font-size': attr.fontSize,
         padding: '5px',
         'text-align': 'justify',
-        left:'200px',
-        top:'200px',
+        left: left,
+        top: top,
         width:'300px',
       })
     }
@@ -673,14 +679,13 @@ app.directive('draggable', ['$document', function($document) {
     link: function(scope, element, attr) {
       var startX = 0, startY = 0, x = 0, y = 0;
 
-      element.css({
-       position: 'absolute',
-       border: '1px solid red',
-       backgroundColor: 'lightgrey',
-       cursor: 'pointer'
-      });
-
       element.on('mousedown', function(event) {
+        element.css({
+         position: 'absolute',
+         border: '1px solid red',
+         backgroundColor: 'lightgrey',
+         cursor: 'pointer'
+        });
         // Prevent default dragging of selected content
         event.preventDefault();
         startX = event.pageX - x;
@@ -699,6 +704,11 @@ app.directive('draggable', ['$document', function($document) {
       }
 
       function mouseup() {
+        element.css({
+         position: 'absolute',
+         backgroundColor: 'lightgrey',
+         cursor: 'pointer'
+        });
         $document.off('mousemove', mousemove);
         $document.off('mouseup', mouseup);
       }

@@ -18,35 +18,35 @@
 				<agent id="inicio">
 					<state id="text1">
 						<on-touch>
+							<div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
+				            	<p>Era uma vez um pequeno cavaleiro que recebeu uma carta de um amigo.</p>
+				        	</div>
 							<target start="inicio#text2">
 						</on-touch>
-						 <div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
-				            <p>Era uma vez um pequeno cavaleiro que recebeu uma carta de um amigo.</p>
-				        </div>
 					</state>
 					<state id="text2">
 						<on-touch>
+							<div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
+				            	<p>Ele ficou muito muito muito surpreso, pois esse amigo tinha sumido a anos.</p>
+				        	</div>
 							<target start="inicio#text3">
 						</on-touch>
-						 <div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
-				            <p>Ele ficou muito muito muito surpreso, pois esse amigo tinha sumido a anos.</p>
-				        </div>
 					</state>
 					<state id="text3">
 						<on-touch>
+							<div style="position: absolute; left: 250px; top: 210px; font-size:30px; width:400px;">
+				           		<p>Só que as noticias na carta não eram muito boas. O seu amigo tinha contraído uma doença misteriosa e precisava 	de ajuda para pegar a cura.</p>
+				        	</div>
 							<target start="inicio#text4">
 						</on-touch>
-						 <div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
-				            <p>Só que as noticias na carta não eram muito boas. O seu amigo tinha contraído uma doença misteriosa e precisava de ajuda para pegar a cura.</p>
-				        </div>
 					</state>
 					<state id="text4">
 						<on-touch>
 							<img src="graphics/sign2.png" style="left: 600px; top: 500px;">
 							<target start="page#2">
 						</on-touch>
-						 <div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
-				            <p>O mais rápido que pôde ele foi ao encontro desse amigo.</p>
+						<div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
+				        	<p>O mais rápido que pôde ele foi ao encontro desse amigo.</p>
 				        </div>
 					</state>
 				</agent>
@@ -72,40 +72,36 @@
 						</on-touch>
 					</state>
 					<state id="verificado">
-						<img id="um" src="graphics/bush.png" style="position: absolute; left:50px; top:505px"/>
 						<on-touch>
+							<img id="um" src="graphics/bush.png" style="position: absolute; left:50px; top:505px"/>
 							<alert>já olhei</alert>
 						</on-touch>
 					</state>
 				</agent>
 				<agent id="bush2">
 					<state id="verifica">
-						<img id="um" src="graphics/bush.png" style="position: absolute; left:150px; top:505px"/>
 						<on-touch>
+							<img id="um" src="graphics/bush.png" style="position: absolute; left:150px; top:505px"/>
 							<alert>não tem nada aqui!</alert>
 							<target start="bush2#verificado">
 						</on-touch>
 					</state>
 					<state id="verificado">
-						<img id="um" src="graphics/bush.png" style="position: absolute; left:150px; top:505px"/>
 						<on-touch>
+							<img id="um" src="graphics/bush.png" style="position: absolute; left:150px; top:505px"/>
 							<alert>já olhei</alert>
 						</on-touch>
 					</state>
 				</agent>
 				<agent id="door">
-					<state id="fechada">
-						<img id="porta_fechada" src="graphics/DoorLocked.png" 
-							style="position: absolute; left:400px; top:400px; width: 80px; height:140px"/>
+					<state>
 						<on-touch>
+							<img id="porta_fechada" src="graphics/DoorLocked.png" 
+							style="position: absolute; left:400px; top:400px; width: 80px; height:140px"/>
 							<test target="hasKey" value="true">
 								<shout target = "_END_PAGE"/>
 							</test>
 						</on-touch> 
-					</state>
-					<state id="aberta">
-						<img id="porta_fechada" src="graphics/DoorOpen.png" 
-							style="position: absolute; left:400px; top:400px; width: 80px; height:140px"/>
 					</state>
 				</agent>
 
@@ -117,38 +113,19 @@
 					Ao entra na caverno o cavaleiro avista duas portas uma a esquerda que parece dar em um caminho sem saida e outra
 					com um foco de luz bem baixo.
 				</board>
-				<agent id="inter_cavaleiro">
-					<state id="parado">
-						<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 300px; top: 440px"></img>
-						<on-touch>
-							<target start="inter_cavaleiro#mov">
-						</on-touch>
-					</state>
-					<state id="mov">
-						<simple-sprite style="position: absolute; left: 300px; top: 440px"
-							src="graphics/idle_spritesheet.png" 
-							frame-width="100" 
-							frame-height="130" 
-							frames="5" 
-							frames-per-row="2" 
-							repeat="true" 
-							speed="60">
-						</simple-sprite>
-						<target start="inter_cavaleiro#parado">
-					</state>
-				</agent>
+				<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 300px; top: 440px"></img>
 				<agent id="porta_esquerda">
 					<state>
-						<img id="porta_esquerda" src="graphics/DoorLocked.png" style="position: absolute; left: 50px; top: 400px; width: 80px ; height: 140px"/>
 						<on-touch>
+							<img id="porta_esquerda" src="graphics/DoorLocked.png" style="position: absolute; left: 50px; top: 400px; width: 80px ; height: 140px"/>
 							<target start="page#4">
 						</on-touch>
 					</state>
 				</agent>
 				<agent id="porta_direita">
 					<state>
-						<img id="porta_esquerda" src="graphics/DoorLocked.png" style="position: absolute; left: 550px; top: 400px; width: 80px ; height: 140px"/>
 						<on-touch>
+							<img id="porta_esquerda" src="graphics/DoorLocked.png" style="position: absolute; left: 550px; top: 400px; width: 80px ; height: 140px"/>
 							<target start="page#5">
 						</on-touch>
 					</state>
@@ -156,7 +133,7 @@
 			</page>
 			<!--Página 4--Caixas-->
 			<page id="4" bg-image="graphics/BGcavern.png">
-			<board set-class="classic-board" left="130px" top="80px" color="white">
+			<board set-class="classic-board" left="130px" top="60px" color="white">
 					Um armazém cheio de caixas o que será que tem dentro delas?(clique nas caixas para vasculha-las.)
 			</board>
 			<property name="antidote" value="false">
@@ -164,10 +141,10 @@
 			<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 200px; top: 430px"/>
 			<agent id="caixa1">
 				<state id="fechada">
-					<img id="caixa" src="graphics/box.png" 
+					<on-touch>
+						<img id="caixa" src="graphics/box.png" 
 						style="position: absolute; left: 200px; top: 200px; 
 						width: 120px ; height: 120px">
-					<on-touch>
 						<alert>caixa vazia</alert>
 						<target start="caixa1#aberta">
 					</on-touch>
@@ -176,17 +153,15 @@
 					<img id="caixa" src="graphics/box.png" 
 						style="position: absolute; left: 200px; top: 200px; 
 						width: 120px ; height: 120px">
-					<on-touch>
-						<alert>já olhei essa caixa</alert>
-					</on-touch>
+					<alert>já olhei essa caixa</alert>
 				</state>
 			</agent>
 			<agent id="caixa2">
 				<state id="fechada">
-					<img id="caixa" src="graphics/box.png" 
+					<on-touch>
+						<img id="caixa" src="graphics/box.png" 
 						style="position: absolute; left: 600px; top: 200px; 
 						width: 120px ; height: 120px">
-					<on-touch>
 						<set target="antidote" value="true">
 						<alert>Você encontrou um elixir da vida!!</alert>
 						<target start="caixa2#aberta">
@@ -196,17 +171,15 @@
 					<img id="caixa" src="graphics/box.png" 
 						style="position: absolute; left: 600px; top: 200px; 
 						width: 120px ; height: 120px">
-					<on-touch>
-						<alert>já olhei essa caixa</alert>
-					</on-touch>
+					<alert>já olhei essa caixa</alert>
 				</state>
 			</agent>
 			<agent id="caixa3">
 				<state id="fechada">
-					<img id="caixa" src="graphics/box.png" 
+					<on-touch>
+						<img id="caixa" src="graphics/box.png" 
 						style="position: absolute; left: 350px; top: 350px; 
 						width: 120px ; height: 120px">
-					<on-touch>
 						<alert>caixa vazia</alert>
 						<target start="caixa3#aberta">
 					</on-touch>
@@ -215,15 +188,13 @@
 					<img id="caixa" src="graphics/box.png" 
 						style="position: absolute; left: 350px; top: 350px; 
 						width: 120px ; height: 120px">
-					<on-touch>
-						<alert>já olhei essa caixa</alert>
-					</on-touch>
+					<alert>já olhei essa caixa</alert>
 				</state>
 			</agent>
 			<agent id="porta_esquerda">
 				<state>
-					<img id="porta_esquerda" src="graphics/DoorOpen.png" style="position: absolute; left: 50px; top: 400px; width: 80px ; height: 140px"/>
 					<on-touch>
+						<img id="porta_esquerda" src="graphics/DoorOpen.png" style="position: absolute; left: 50px; top: 400px; width: 80px ; height: 140px"/>
 						<target start="page#3">
 					</on-touch>
 				</state>
@@ -239,8 +210,8 @@
 					<board set-class="classic-board" font-size="30px" left="200px" top="100px" color="white">
 						Clique no zombie para ver o que acontece.
 					</board>
-					<img id="zombie" src="graphics/zombie.png" style="position: absolute; left: 600px; top:430px; width: 100px; height: 130px"/>
 					<on-touch>
+						<img id="zombie" src="graphics/zombie.png" style="position: absolute; left: 600px; top:430px; width: 100px; height: 130px"/>
 						<test target="antidote" value="true">
 							<shout target="amigo#vivo"/>
 						</test>
@@ -261,7 +232,7 @@
 					<board set-class="classic-board" width="400px" height="200px" left="200px" top="100px" color="white">
 						Oh não você esqueceu o elixir!! Morrir!!
 					</board>
-					<animation speed="10" top="430px" left="600px" repeat="no" width="100px" height="130px" style="left:" >
+					<animation speed="10" top="430px" left="600px" repeat="no" width="100px" height="130px">
 						<img src="graphics/animation-dead/dead1.png"></img>
 						<img src="graphics/animation-dead/dead2.png"></img>
 						<img src="graphics/animation-dead/dead3.png"></img>
