@@ -67,6 +67,7 @@
 						<img id="um" src="graphics/bush.png" style="position: absolute; left:50px; top:505px"/>
 						<on-touch>
 							<alert>chave encontrada!</alert>
+							<play type="audio" src="graphics/audio1.mp3">
 							<set target="hasKey" value="true">
 							<target start="bush1#verificado">
 						</on-touch>
@@ -109,11 +110,11 @@
 			<!--Página 3--Caverna-->
 			<page id="3"  bg-image="graphics/BGcavern.png">
 				<img id="floor" src="graphics/cavern_floor.png" style="position: absolute; left: 0px; top: 550px; width: 800px ; height: 100px"/>
-				<board set-class="classic-board" font-size="20px" left="100px" top="100px" color="white">
+				<board draggable set-class="classic-board" font-size="20px" left="100px" top="100px" color="white">
 					Ao entra na caverno o cavaleiro avista duas portas uma a esquerda que parece dar em um caminho sem saida e outra
 					com um foco de luz bem baixo.
 				</board>
-				<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 300px; top: 440px"></img>
+				<img draggable src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 300px; top: 440px"></img>
 				<agent id="porta_esquerda">
 					<state>
 						<on-touch>

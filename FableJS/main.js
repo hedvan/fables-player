@@ -679,6 +679,9 @@ app.directive('draggable', ['$document', function($document) {
     link: function(scope, element, attr) {
       var startX = 0, startY = 0, x = 0, y = 0;
 
+      console.log(element);
+      var width = element[0].clientWidth;
+      var height = element[0].clientHeight;
       element.on('mousedown', function(event) {
         element.css({
          position: 'absolute',
@@ -690,13 +693,14 @@ app.directive('draggable', ['$document', function($document) {
         event.preventDefault();
         startX = event.pageX - x;
         startY = event.pageY - y;
+
         $document.on('mousemove', mousemove);
         $document.on('mouseup', mouseup);
       });
 
       function mousemove(event) {
-        y = event.pageY - startY;
-        x = event.pageX - startX;
+        y = event.pageY-(height/2);
+        x = event.pageX-(width/2);
         element.css({
           top: y + 'px',
           left:  x + 'px'
@@ -706,6 +710,7 @@ app.directive('draggable', ['$document', function($document) {
       function mouseup() {
         element.css({
          position: 'absolute',
+         border: '1px solid rgba(255, 255, 255, 0.8)',
          backgroundColor: 'lightgrey',
          cursor: 'pointer'
         });
@@ -715,3 +720,24 @@ app.directive('draggable', ['$document', function($document) {
     }
   };
 }]);
+
+//<play type="" src="">
+app.directive('play',function(){
+  return{
+    restrict: 'E',
+    link: function(scope, elem, attr, ctrl){
+      //criar elemento audio
+      if(attr.type == "audio")
+        var media = new Audio(attr.src);
+      
+      /*corrigir on-touch
+      - ele está sendo setado pelo state*/
+      var onTouch = Elements.searchElement(elem,"state");
+      console.log(onTouch);
+      onTouch.bind('click',function(){
+        media.play();
+      })
+
+    }
+  }
+})
