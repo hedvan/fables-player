@@ -4,14 +4,17 @@
 	<title>Fable-Player</title>
 	<script type="text/javascript" src="lib/angular.js"></script>
 	<script type="text/javascript" src="lib/angular-simple-sprite.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/angular-strap/v2.3.8/angular-strap.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/angular-strap/v2.3.8/angular-strap.tpl.min.js"></script>
 	<script type="text/javascript" src="../FableJS/main.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 <body>
 	<fable width="800px" height="600px" bg-sound="graphics/montagne.mp3">
-			<page id="1" bg-image="graphics/BG.png">
-				<div class="title" id="title" style="position: relative; left:200px; top:50px;">O pequeno cavaleiro</div>
+			<page id="1" bg-image="graphics/BG.png" transition-fade-in>
+				<div class="title" id="title" style="position: relative; left:200px; top:50px;"
+					transition-click-fade-out>O pequeno cavaleiro</div>
 				<!--cavaleiro e historia-->
 
 				<img src="graphics/char1.png" width="100" height="130" style="left: 100px; top: 300px"></img>
@@ -19,7 +22,7 @@
 					<state id="text1">
 						<on-touch>
 							<div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
-				            	<p>Era uma vez um pequeno cavaleiro que recebeu uma carta de um amigo.</p>
+				            	<p transition-click-fade-out>Era uma vez um pequeno cavaleiro que recebeu uma carta de um amigo.</p>
 				        	</div>
 							<target start="inicio#text2">
 						</on-touch>
@@ -27,7 +30,7 @@
 					<state id="text2">
 						<on-touch>
 							<div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
-				            	<p>Ele ficou muito muito muito surpreso, pois esse amigo tinha sumido a anos.</p>
+				            	<p transition-fade-in >Ele ficou muito muito muito surpreso, pois esse amigo tinha sumido a anos.</p>
 				        	</div>
 							<target start="inicio#text3">
 						</on-touch>
@@ -35,18 +38,18 @@
 					<state id="text3">
 						<on-touch>
 							<div style="position: absolute; left: 250px; top: 210px; font-size:30px; width:400px;">
-				           		<p>Só que as noticias na carta não eram muito boas. O seu amigo tinha contraído uma doença misteriosa e precisava 	de ajuda para pegar a cura.</p>
+				           		<p transition-fade-in>Só que as noticias na carta não eram muito boas. O seu amigo tinha contraído uma doença misteriosa e precisava 	de ajuda para pegar a cura.</p>
 				        	</div>
 							<target start="inicio#text4">
 						</on-touch>
 					</state>
 					<state id="text4">
 						<on-touch>
-							<img src="graphics/sign2.png" style="left: 600px; top: 500px;">
+							<img src="graphics/sign2.png" style="left: 600px; top: 500px;" transition-tada>
 							<target start="page#2">
 						</on-touch>
 						<div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
-				        	<p>O mais rápido que pôde ele foi ao encontro desse amigo.</p>
+				        	<p transition-fade-in>O mais rápido que pôde ele foi ao encontro desse amigo.</p>
 				        </div>
 					</state>
 				</agent>
@@ -64,10 +67,10 @@
 				<img id="floor" src="graphics/block.png" style="left: 0px; top: 550px; width: 800px ; height: 100px"/>
 				<agent id="bush1">
 					<state id="verifica">
-						<img id="um" src="graphics/bush.png" style="position: absolute; left:50px; top:505px"/>
 						<on-touch>
+							<img id="um" src="graphics/bush.png" style="position: absolute; left:50px; top:505px"/>
 							<alert>chave encontrada!</alert>
-							<play type="audio" src="graphics/audio1.mp3">
+							<play type="audio" src="graphics/bush_sound.wav">
 							<set target="hasKey" value="true">
 							<target start="bush1#verificado">
 						</on-touch>
@@ -101,6 +104,10 @@
 							style="position: absolute; left:400px; top:400px; width: 80px; height:140px"/>
 							<test target="hasKey" value="true">
 								<shout target = "_END_PAGE"/>
+								<play type="audio" src="graphics/door_effect.wav">
+								<else>
+									<alert>teste</alert>
+								</else>
 							</test>
 						</on-touch> 
 					</state>
@@ -120,6 +127,7 @@
 						<on-touch>
 							<img id="porta_esquerda" src="graphics/DoorLocked.png" style="position: absolute; left: 50px; top: 400px; width: 80px ; height: 140px"/>
 							<target start="page#4">
+							<play type="audio" src="graphics/door_effect.wav">
 						</on-touch>
 					</state>
 				</agent>
@@ -128,6 +136,7 @@
 						<on-touch>
 							<img id="porta_esquerda" src="graphics/DoorLocked.png" style="position: absolute; left: 550px; top: 400px; width: 80px ; height: 140px"/>
 							<target start="page#5">
+							<play type="audio" src="graphics/door_effect.wav">
 						</on-touch>
 					</state>
 				</agent>
@@ -151,7 +160,8 @@
 					</on-touch>
 				</state>
 				<state id="aberta">
-					<img id="caixa" src="graphics/box.png" 
+					<img id="caixa" src="graphics/box.png"
+						transition-fade-out 
 						style="position: absolute; left: 200px; top: 200px; 
 						width: 120px ; height: 120px">
 					<alert>já olhei essa caixa</alert>
@@ -170,6 +180,7 @@
 				</state>
 				<state id="aberta">
 					<img id="caixa" src="graphics/box.png" 
+						transition-fade-out
 						style="position: absolute; left: 600px; top: 200px; 
 						width: 120px ; height: 120px">
 					<alert>já olhei essa caixa</alert>
@@ -186,7 +197,8 @@
 					</on-touch>
 				</state>
 				<state id="aberta">
-					<img id="caixa" src="graphics/box.png" 
+					<img id="caixa" src="graphics/box.png"
+						transition-fade-out 
 						style="position: absolute; left: 350px; top: 350px; 
 						width: 120px ; height: 120px">
 					<alert>já olhei essa caixa</alert>

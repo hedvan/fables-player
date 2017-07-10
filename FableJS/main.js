@@ -61,7 +61,7 @@ var Elements = (function(){
   var getProperty = function(id){
     for(var i = 0; i < properties.length; i++){
       if(properties[i].id == id){
-        console.log("achei elemento");
+        console.log("achei propriedade");
         return properties[i];
       }
     }
@@ -70,10 +70,17 @@ var Elements = (function(){
   //Procura a tag na qual desejo manipular
   var searchElement = function(elem, type){
     var parent = elem.parent();
-    console.log("type: "+type); 
+    console.log("type: "+parent);
+    if(parent == undefined){
+      console.log("dua lipa")
+    }
+      
     while((parent[0].localName != type)){
       parent = parent.parent();
-      console.log(parent[0].id);
+      if(parent == undefined){
+        console.log("dua lipa")
+        break;
+      }
     }
     return parent;
   }
@@ -173,60 +180,18 @@ app.directive('fable', function() {
   };
 });
 
+
+
 //Module Transitions
-var Transitions = (function(){
-
-  var setAnimation = function(type,id,x,y,xmove,ymove){
-    var anim, frames;
-    if(type === "fly"){
-      anim = '#'+id+"{ animation-name: "+"anim"+"-"+id+"; animation-duration: 5s; animation-iteration-count: 10; position: absolute; }";
-      frames = "@keyframes "+"anim"+"-"+id+" { from { left: "+x+"px; top:"+y+"px;} to { left: "+xmove+"px; top: "+ymove+"px;}}";
-    }else if(type === "spin"){
-      anim = '#'+id+"{animation-name: "+"anim"+"-"+id+"; animation-duration: 4000ms; animation-iteration-count: infinite; position: absolute; left:"+x+"px; top: "+y+"px}"; 
-      frames = "@keyframes "+"anim"+"-"+id+"{ from{ transform: rotate(0deg);} to{transform: rotate(360deg);}}";
-    }else if(type === "fade-out"){
-      anim = '#'+id+"{ opacity: 0; animation: "+"anim"+"-"+id+" 2s linear; }";
-      frames = "@keyframes "+"anim"+"-"+id+"{ 0% {opacity: 1} 50%{opacity: 0.5} 100% {opacity: 0} }";
-    }else if(type === "fade-in"){
-      anim = '#'+id+"{opacity: 1; animation: "+"anim"+"-"+id+" 2s linear;}";
-      frames ="@keyframes "+"anim"+"-"+id+" { 0% {opacity: 0} 50%{opacity: 0.5} 100% {opacity: 1} }";
-    }
-
-    return anim+" "+frames;
-  }
-
-  return{
-    setAnimation: setAnimation
-  }
-}());
 
 //<transition>
-app.directive('transition', function() {
+app.directive('bounce', function() {
   return {
-       restrict: 'E',
-       transclude: true,
-       scope: {
-        id: '@id',
-        type: '@type',
-        x: '@x',
-        y: '@y',
-        xmove: '@xmove',
-        ymove: '@ymove'
-       },
+       restrict: 'AE',
        link:function(scope, elem, attr){
-          var css = Transitions.setAnimation(attr.type, attr.id, attr.x, attr.y, attr.xmove, attr.ymove);
-          head = document.head || document.getElementsByTagName('head')[0],
-          style = document.createElement('style');
-
-          style.type = 'text/css';
-          if (style.styleSheet){
-            style.styleSheet.cssText = css;
-          } else {
-            style.appendChild(document.createTextNode(css));
-          }
-          head.appendChild(style);
-       },
-       template: '<div ng-transclude></div>'
+        var classe = document.getElementsByClassName('element-animation-bounce');
+        console.log(classe);
+       }
   };
 });
 
@@ -514,7 +479,7 @@ app.directive('property',function(){
     restrict: 'E',
     link: function(scope, elem, attr, ctrl){
       var prop = new Property(attr.name, attr.value);
-      console.log("criei property");
+      console.log(prop);
       Elements.addProperty(prop);
     }
   }
@@ -543,12 +508,12 @@ app.directive('set',function(){
   return{
     restrict: 'E',
     link: function(scope, elem, attr, ctrl){
-      //pega o property
-      var prop = Elements.getProperty(attr.target);
-
+      
       var element = Elements.searchElement(elem,"on-touch");
       //e uso ele para ativar ações da tag set
       element.bind('click',function(){
+        //pega o property
+        var prop = Elements.getProperty(attr.target);
         console.log(prop);
         prop.setValue(attr.value);
       })
@@ -556,31 +521,76 @@ app.directive('set',function(){
   }
 });
 
+var Alert = (function(){
+  function Alert(text, elem){
+    this.text = text;
+    this.element = elem;
+    this.flag = true;
+  }
+
+  Alert.prototype.createAlert = function($animate){
+    //estilizando
+    $animate.addClass(this.element,'element-animation-fadeIn');
+    this.element.css({
+      display: 'none',
+      position: 'absolute',
+      background: 'red', 
+      'font-size': '30px',
+      padding: '5px',
+      'text-align': 'justify',
+      left: '50px',
+      top: '50',
+      width:'300px'
+    })
+  }
+
+  Alert.prototype.actionAlert = function(){
+    
+    if(this.flag){
+      this.element[0].style.display = "block";
+      this.flag = false;
+      console.log("mostrar")
+    }else{
+      this.element[0].style.display = "none";
+      this.flag = true;
+      console.log("nao mostrar")
+    } 
+  }
+
+  return Alert;
+}());
+
 //<alert>
-app.directive('alert',function(){
+app.directive('alert',function($animate){
   return{
     restrict: 'E',
     link: function(scope, elem, attr, ctrl){
-       elem[0].style.display = "none";
-       var text = String(elem[0].innerHTML);
-       var state = Elements.searchElement(elem,"state");
-       state.bind('click',function(){
-        alert(text);
+        var flag = {value:true,button:false};
+        var text = elem[0].childNodes[0].data;
+        var alert = new Alert(text,elem);
+        alert.createAlert($animate);
 
-       })
-       
+        var onTouch = elem.parent();
+        onTouch.bind('click',function(){
+          alert.actionAlert();
+        });
     }
   }
 })
 
 //<test>
-app.directive('test',function(){
+app.directive('test',function($animate){
   return{
     restrict: 'E',
     link: function(scope, elem, attr, ctrl){
+
       //pega o on-touch
-      var onClick = Elements.searchElement(elem,"state");
-      
+      var onClick = Elements.searchElement(elem,"on-touch");
+      var alert = new Alert("text",elem);
+      alert.createAlert($animate);
+      //pegar o que ta no else e guardar aqui;
+      elem[0].childNodes[0].data="fueifwiuegwy";
+
       onClick.bind('click',function(){
         //pegar a property
         var property = Elements.getProperty(attr.target);
@@ -589,12 +599,14 @@ app.directive('test',function(){
         //pegar shout
         var shout = elem[0].children;
         var shout_target = shout[0].attributes[0].nodeValue;
+        //
+        var xelse =elem.find("else");
+        var message = xelse.find("alert");
+        message.remove();
         //comparar
         if(property.getValue() == test_value){
-          console.log(shout);
-          console.log(shout_target);
+
           if(shout_target == "_END_PAGE"){
-              alert("entrei aqui");
               book.nextPage();
             }else{
             //pegar o shout target e fazer dele o element e elementId
@@ -606,16 +618,16 @@ app.directive('test',function(){
             //gero a ação de click em todos os elementos contidos no state
             var state = Elements.searchElement(elem,"state");
             var touch = new OnTouch("start", element, elementId, elem);
-            console.log("aaaelement: "+element+" elementId: "+elementId);
             if(element == "page"){
-              console.log("entrei no page");
               touch.pageStart(elementId, book);
             }
             if(Elements.checkAgent(element)){
-              console.log("entrei no agent: ");
               touch.agentStart(element, elementId);
             }
           }
+        }else{
+          //AJEITAR AQUI
+          alert.actionAlert();
         }
       })
 
@@ -679,9 +691,6 @@ app.directive('draggable', ['$document', function($document) {
     link: function(scope, element, attr) {
       var startX = 0, startY = 0, x = 0, y = 0;
 
-      console.log(element);
-      var width = element[0].clientWidth;
-      var height = element[0].clientHeight;
       element.on('mousedown', function(event) {
         element.css({
          position: 'absolute',
@@ -699,8 +708,8 @@ app.directive('draggable', ['$document', function($document) {
       });
 
       function mousemove(event) {
-        y = event.pageY-(height/2);
-        x = event.pageX-(width/2);
+        y = event.pageY-startY/2;
+        x = event.pageX-startX/2;
         element.css({
           top: y + 'px',
           left:  x + 'px'
@@ -727,17 +736,81 @@ app.directive('play',function(){
     restrict: 'E',
     link: function(scope, elem, attr, ctrl){
       //criar elemento audio
-      if(attr.type == "audio")
+      if(attr.type == "audio"){
         var media = new Audio(attr.src);
+        media.volume = 0.2;
+      }
       
       /*corrigir on-touch
       - ele está sendo setado pelo state*/
-      var onTouch = Elements.searchElement(elem,"state");
-      console.log(onTouch);
+      var onTouch = Elements.searchElement(elem,"on-touch");
       onTouch.bind('click',function(){
+        console.log("estou funcionando")
         media.play();
       })
 
+    }
+  }
+})
+
+//diretivas de transições
+
+app.directive('transitionBounce',function($animate){
+  return{
+    restrict: 'A',
+    link: function(scope, elem, attr, ctrl){
+      $animate.addClass(elem,"element-animation-bounce");
+    }
+  }
+})
+
+app.directive('transitionFadeIn',function($animate){
+  return{
+    restrict: 'A',
+    link: function(scope, elem, attr, ctrl){
+      $animate.addClass(elem,"element-animation-fadeIn");
+    }
+  }
+})
+
+app.directive('transitionTada',function($animate){
+  return{
+    restrict: 'A',
+    link: function(scope, elem, attr, ctrl){
+      $animate.addClass(elem,"element-animation-tada");
+    }
+  }
+})
+
+app.directive('transitionScaling',function($animate){
+  return{
+    restrict: 'A',
+    link: function(scope, elem, attr, ctrl){
+      $animate.addClass(elem,"element-animation-scaling");
+    }
+  }
+})
+
+app.directive('transitionFadeOut',function($animate){
+  return{
+    restrict: 'A',
+    link: function(scope, elem, attr, ctrl){
+      $animate.addClass(elem,"element-animation-fadeOut");
+    }
+  }
+})
+
+app.directive('transitionClickFadeOut',function($animateCss,$timeout){
+  return{
+    restrict: 'A',
+    link: function(scope, elem, attr, ctrl){
+      var animator = $animateCss(elem,{
+        addClass: 'element-animation-fadeOut'
+      })
+
+      elem.bind('click',function(){
+        animator.start();
+      })
     }
   }
 })
