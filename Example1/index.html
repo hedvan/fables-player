@@ -9,18 +9,21 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
 <body>
-	<fable width="800px" height="600px" bg-sound="graphics/montagne.mp3">
-			<page id="1" bg-image="graphics/BG.png" transition-fade-in>
+	<fable width="1000px" height="600px" bg-sound="graphics/montagne.mp3">
+			<page id="1" bg-image="graphics/BG.png" transition="fadeIn">
 				<div class="title" id="title" style="position: relative; left:200px; top:50px;"
-					transition-click-fade-out>O pequeno cavaleiro</div>
+					transition="fadeIn">O pequeno cavaleiro</div>
+					<on-touch>
+						eoifhwoifeoi
+						<audio id="audioTeste" src="graphics/alone.mp3" role="play"></audio>
+					</on-touch>
 				<!--cavaleiro e historia-->
-
-				<img src="graphics/char1.png" width="100" height="130" style="left: 100px; top: 300px"></img>
+				<img  src="graphics/char1.png" width="100" height="130" style="left: 100px; top: 300px"></img>
 				<agent id="inicio">
 					<state id="text1">
 						<on-touch>
 							<div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
-				            	<p transition-click-fade-out>Era uma vez um pequeno cavaleiro que recebeu uma carta de um amigo.</p>
+				            	<p transition="fadeIn">Era uma vez um pequeno cavaleiro que recebeu uma carta de um amigo.</p>
 				        	</div>
 							<target start="inicio#text2">
 						</on-touch>
@@ -28,7 +31,7 @@
 					<state id="text2">
 						<on-touch>
 							<div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
-				            	<p transition-fade-in >Ele ficou muito muito muito surpreso, pois esse amigo tinha sumido a anos.</p>
+				            	<p transition="fadeIn" >Ele ficou muito muito muito surpreso, pois esse amigo tinha sumido a anos.</p>
 				        	</div>
 							<target start="inicio#text3">
 						</on-touch>
@@ -36,18 +39,18 @@
 					<state id="text3">
 						<on-touch>
 							<div style="position: absolute; left: 250px; top: 210px; font-size:30px; width:400px;">
-				           		<p transition-fade-in>Só que as noticias na carta não eram muito boas. O seu amigo tinha contraído uma doença misteriosa e precisava 	de ajuda para pegar a cura.</p>
+				           		<p transition="fadeIn">Só que as noticias na carta não eram muito boas. O seu amigo tinha contraído uma doença misteriosa e precisava 	de ajuda para pegar a cura.</p>
 				        	</div>
 							<target start="inicio#text4">
 						</on-touch>
 					</state>
 					<state id="text4">
 						<on-touch>
-							<img src="graphics/sign2.png" style="left: 600px; top: 500px;" transition-tada>
+							<img src="graphics/sign2.png" style="left: 600px; top: 500px;" transition="Tada">
 							<target start="page#2">
 						</on-touch>
 						<div style="position: absolute; left: 250px; top: 220px; font-size:30px; width:400px;">
-				        	<p transition-fade-in>O mais rápido que pôde ele foi ao encontro desse amigo.</p>
+				        	<p transition="fadeIn">O mais rápido que pôde ele foi ao encontro desse amigo.</p>
 				        </div>
 					</state>
 				</agent>
@@ -65,6 +68,7 @@
 				<img id="floor" src="graphics/block.png" style="left: 0px; top: 550px; width: 800px ; height: 100px"/>
 				<agent id="bush1">
 					<state id="verifica">
+						<autoplay type="audio" src="graphics/bush_sound.wav">
 						<on-touch>
 							<img id="um" src="graphics/bush.png" style="position: absolute; left:50px; top:505px"/>
 							<alert>chave encontrada!</alert>
@@ -74,10 +78,7 @@
 						</on-touch>
 					</state>
 					<state id="verificado">
-						<on-touch>
-							<img id="um" src="graphics/bush.png" style="position: absolute; left:50px; top:505px"/>
-							<alert>já olhei</alert>
-						</on-touch>
+						<img id="um" src="graphics/bush.png" style="position: absolute; left:50px; top:505px"/>
 					</state>
 				</agent>
 				<agent id="bush2">
@@ -89,37 +90,37 @@
 						</on-touch>
 					</state>
 					<state id="verificado">
+						<p id="keyEntrada" draggable style="position: absolute; left:150px; top:305px"> key </p>
 						<on-touch>
-							<img id="um" src="graphics/bush.png" style="position: absolute; left:150px; top:505px"/>
+						<img id="um" src="graphics/bush.png" style="position: absolute; left:150px; top:505px"/>
 							<alert>já olhei</alert>
 						</on-touch>
 					</state>
 				</agent>
 				<agent id="door">
-					<state>
-						<on-touch>
-							<img id="porta_fechada" src="graphics/DoorLocked.png" 
+					<state id="fechada">
+						<detect target="keyEntrada" event="changeState" of="door" for="aberta" x="400" y="400" w="80" h="140">
+						</detect>
+						<img id="porta_fechada" src="graphics/DoorLocked.png" 
 							style="position: absolute; left:400px; top:400px; width: 80px; height:140px"/>
-							<test target="hasKey" value="true">
-								<shout target = "_END_PAGE"/>
-								<play type="audio" src="graphics/door_effect.wav">
-								<else>
-									<alert>teste</alert>
-								</else>
-							</test>
-						</on-touch> 
+					</state>
+					<state id="aberta">
+						<on-touch>
+							<img id="porta_fechada" src="graphics/DoorOpen.png" 
+								style="position: absolute; left:400px; top:400px; width: 80px; height:140px"/>
+							<target start="page#3">
+						</on-touch>	
 					</state>
 				</agent>
-
 			</page>
 			<!--Página 3--Caverna-->
 			<page id="3"  bg-image="graphics/BGcavern.png">
 				<img id="floor" src="graphics/cavern_floor.png" style="position: absolute; left: 0px; top: 550px; width: 800px ; height: 100px"/>
-				<board draggable set-class="classic-board" font-size="20px" left="100px" top="100px" color="white">
+				<board id="placa1" set-class="classic-board" font-size="20px" left="100px" top="100px" color="white">
 					Ao entra na caverno o cavaleiro avista duas portas uma a esquerda que parece dar em um caminho sem saida e outra
 					com um foco de luz bem baixo.
 				</board>
-				<img draggable src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 300px; top: 440px"></img>
+				<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 300px; top: 440px"></img>
 				<agent id="porta_esquerda">
 					<state>
 						<on-touch>
@@ -158,11 +159,9 @@
 					</on-touch>
 				</state>
 				<state id="aberta">
-					<img id="caixa" src="graphics/box.png"
-						transition-fade-out 
+					<img  draggable id="caixa" src="graphics/box.png"
 						style="position: absolute; left: 200px; top: 200px; 
 						width: 120px ; height: 120px">
-					<alert>já olhei essa caixa</alert>
 				</state>
 			</agent>
 			<agent id="caixa2">
@@ -224,19 +223,30 @@
 					<on-touch>
 						<img id="zombie" src="graphics/zombie.png" style="position: absolute; left: 600px; top:430px; width: 100px; height: 130px"/>
 						<test target="antidote" value="true">
-							<shout target="amigo#vivo"/>
+							<shout execute="changeState" target="amigo#vivo"/>
 						</test>
 						<test target="antidote" value="false">
-							<shout target="amigo#morto"/>
+							<shout execute="changeState" target="amigo#morto"/>
 						</test>
 					</on-touch> 
 				</state>
 				<!--estado do amigo voltando a vida-->
 				<state id="vivo">
-					<img id="amigo" src="graphics/char2.png" style="position: absolute; left: 600px; top:430px; width: 100px; height: 130px"/>
 					<board set-class="classic-board" width="400px" height="200px" left="200px" top="100px" color="white">
 						Você me salvou primeiro cavaleiro!! Obrigado!!
 					</board>
+					<animation speed="10" top="430px" left="600px" repeat="yes" width="100px" height="130px">
+						<img src="graphics/animation-walk/walk1.png"></img>
+						<img src="graphics/animation-walk/walk2.png"></img>
+						<img src="graphics/animation-walk/walk3.png"></img>
+						<img src="graphics/animation-walk/walk4.png"></img>
+						<img src="graphics/animation-walk/walk5.png"></img>
+						<img src="graphics/animation-walk/walk6.png"></img>
+						<img src="graphics/animation-walk/walk7.png"></img>
+						<img src="graphics/animation-walk/walk8.png"></img>
+						<img src="graphics/animation-walk/walk9.png"></img>
+						<img src="graphics/animation-walk/walk10.png"></img>
+					</animation>
 				</state>
 				<!--estado do amigo morrendo-->
 				<state id="morto">
@@ -259,7 +269,6 @@
 					</animation>
 				</state>
 			</agent>
-				
 			</page>
 	</fable>
 </body>

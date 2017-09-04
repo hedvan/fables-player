@@ -1,17 +1,30 @@
+/**
+* criação da mudança de estado do agent
+* 
+*/
+
+
+
 var app = angular.module("FablePlayer",['simple-sprite']);
 
 //Module Elements
 var Elements = (function(){
+  /**
+  * Arrays que guardam os objetos do Fables
+  */
   var animations = new Array();
   var agents = new Array();
   var sounds = new Array();
   var properties = new Array();
+  var draggable = new Array();
+  var detectable = new Array();
 
-  //Animations
+  //guarda um objeto Animation
   var getAnimation = function(animation){
     animations.push(animation);    
   }
-  //Checa quais animações devem ser iniciadas
+
+  //Verifica quando as animações devem ser iniciadas
   var checkAnimation = function(number){
     for(var i = 0; i < animations.length; i++)
       if(animations[i].pageId == number){
@@ -19,7 +32,7 @@ var Elements = (function(){
       }
   }
 
-  //Agents
+  //guarda um objeto Agent
   var addAgent = function(agent){
     agents.push(agent);
   }
@@ -40,11 +53,12 @@ var Elements = (function(){
     return false; 
   }
 
-  //Sounds
+  //guarda um objeto som
   var addSound = function(sound){
     sounds.push(sound);
   }
 
+  //retorna um objeto som
   var getSound = function(id){
     for(var i = 0; i < sounds.length; i++){
       if(sounds[i].id == id){
@@ -53,32 +67,52 @@ var Elements = (function(){
     }
   }
 
-  //Properties
+  //guarda um objeto property
   var addProperty = function(property){
     properties.push(property);
   }
 
+  //retorna um objeto property
   var getProperty = function(id){
     for(var i = 0; i < properties.length; i++){
-      if(properties[i].id == id){
-        console.log("achei propriedade");
+      if(properties[i].id == id)
         return properties[i];
-      }
+    }
+  }
+
+  //guarda um objeto drag
+  var addDrag = function(drag){
+    draggable.push(drag);
+  }
+
+  //retorna drag
+  var getDrag = function(id){
+    for(var i = 0; i < draggable.length; i++){
+      if(draggable[i].id == id)
+        return draggable[i];
+    }
+  }
+
+  //guarda um objeto detect
+  var addDetectable = function(dectect){
+    detectable.push(dectect);
+  }
+
+  //retorn detect
+  var getDetectable = function(id){
+    for(var i = 0; i < detectable.length; i++){
+      if(detectable[i].id == id)
+        return detectable[i];
     }
   }
 
   //Procura a tag na qual desejo manipular
   var searchElement = function(elem, type){
     var parent = elem.parent();
-    console.log("type: "+parent);
-    if(parent == undefined){
-      console.log("dua lipa")
-    }
       
     while((parent[0].localName != type)){
       parent = parent.parent();
       if(parent == undefined){
-        console.log("dua lipa")
         break;
       }
     }
@@ -95,20 +129,29 @@ var Elements = (function(){
     getSound: getSound,
     addProperty: addProperty,
     getProperty: getProperty,
-    searchElement: searchElement
+    searchElement: searchElement,
+    addDrag: addDrag,
+    getDrag: getDrag,
+    addDetectable: addDetectable,
+    getDetectable: getDetectable
   }
 }());
 
 //Class Book
 var Book =(function(){
+  //Construtor
   function Book(){
     this.pages = new Array();
     this.currentPage = 1;
     this.sound;
   }
+
+  //Adiciona uma página ao livro
   Book.prototype.addPage = function(page){
     this.pages.push(page);
   }
+
+  //Troca de página
   Book.prototype.changePage = function(number){
     if(number <= this.pages.length){
       var sound = Elements.getSound("bgSound"+this.currentPage);
@@ -130,24 +173,26 @@ var Book =(function(){
               this.pages[i].page.style.display = "none";
           }
     }
-
     Elements.checkAnimation(this.currentPage);
   }
 
+  //avança para a próxima
   Book.prototype.nextPage = function(){
-    book.changePage(this.currentPage+1);
+    ModuleFable.getBook().changePage(this.currentPage+1);
   }
 
+  //retorna a página anterior
   Book.prototype.previousPage = function(){
     this.changePage(this.currentPage-1);
   }
 
   return Book;
-}());
+}());//Fim da classe Book
 
-var book =new Book();
+//isolar livro no modulo
+//var ModuleFable.getBook() = new Book();//Cria um livro
 
-//<fable>
+//diretiva <fable>
 app.directive('fable', function() {
   return {
       restrict: 'E',
@@ -157,9 +202,11 @@ app.directive('fable', function() {
         height: '@height'
       },
       link:function(scope,elem,attr){
-
+        //iniciando o fábulas
+        var book = ModuleFable.initializeBook();
+        
         var list = elem.find("page");
-        //pega todos os elements page e salva em um array
+        //pega todos os elementos page e salva em um array
         for(var i = 0; i < list.length; i++){
         	book.addPage({id: list[i].id, page: list[i]});
         }
@@ -171,54 +218,60 @@ app.directive('fable', function() {
           bgSound.start();
           Elements.addSound(bgSound);
         }
+
       },
-      template: '<div class="top"></div>'
-                 +'<div class="left"></div>'
-                 +'<div class="right"></div>'
-                 +'<div style="width:{{width}}; height:{{height}}; border:1px solid #000" ng-transclude></div>'
-                 +'<div class="bottom"></div>'
+      template: '<div class="container">'+'<div class="box" style="width:{{width}}; height:{{height}}" ng-transclude>'+'</div>'
   };
 });
 
+/* Módulo Fabulas
+* - guarda informações sobre o tamanho da tela
+*/
+var ModuleFable = (function(){
+  var book;
 
-//<on-touch>
+  var initializeBook = function(){
+    book = new Book();
+    return book;
+  }
+
+  var getBook = function(){
+    return book;
+  }
+
+  return{
+    getBook: getBook,
+    initializeBook: initializeBook
+  }
+}());//Fim do módulo Canvas
+
+//diretiva <on-touch>
 app.directive('onTouch', function() {
   return {
        restrict: 'E',
        link:function(scope, elem, attr){
           //identificar o tipo do elemento
           var childs = elem.children();
-          var action, element;
-          console.log(childs);
-          console.log(elem);
           //pegando a tag agent
-          var parent = elem.parent();
-          while((parent[0].localName != "agent" && parent[0].localName != "page")){
-            parent = parent.parent();
-          }
-
-          var element,elementId;
-          //garante que na bagunça de tags sempre pegue o target
-          for(var i = 0; i < childs.length; i++){
-            if(childs[i].tagName == "TARGET"){
-              action = childs[i].attributes[0].localName;// action: start
-              res = childs[i].attributes[0].value.split("#");
-              element = res[0];
-              elementId= res[1];
+          function getParent(){
+            var parent = elem.parent();
+            while((parent[0].localName != "agent" && parent[0].localName != "page")){
+              parent = parent.parent();
             }
+            return parent;
           }
+          var parent = getParent();
 
-          //gero a ação de click em todos os elementos contidos no state
-          var touch = new OnTouch(action, element, elementId, elem);
+          var act = new Action(elem);
+          var actData = act.setAgentAndStateAndAction(childs);
+
           elem.bind('click',function(){
-            console.log("element: "+element+" elementId: "+elementId);
-            if(element == "page"){
-              console.log("entrei no page");
-              touch.pageStart(elementId, book);
-            }
-            if(Elements.checkAgent(element)){
-              console.log("entrei no agent: ");
-              touch.agentStart(element, elementId);
+            if(actData.action == "start"){
+              if(actData.agent == "page")
+                act.pageStart(ModuleFable.getBook());//troca de página
+              
+              if(Elements.checkAgent(actData.agent))
+                act.startState();//muda de state
             }
           })
           
@@ -226,50 +279,54 @@ app.directive('onTouch', function() {
   };
 });
 
-//Class OnTouch
-var OnTouch =(function(){
-  function OnTouch(action, element,elementId , elem){
-    this.agent = "";
-    this.action = action;
-    this.element = element;
+/*Class Action
+* - Executa as ações do livro como mudar de página
+* - Alterar estado de um elemento
+* - atualizar um agente
+*/
+var Action = (function(){
+  function Action(elem){
+    this.action = "";//action = start
+    this.agent = "";//element = agent
     this.elem = elem;
-    this.elementId = elementId;
+    this.state = "";//elementId = state
   }
-  OnTouch.prototype.start = function(book1){
-    var that = this;
+
+  Action.prototype.setAgentAndStateAndAction = function(childs){
+    for(var i = 0; i < childs.length; i++){
+      if(childs[i].tagName == "TARGET"){
+        this.action = childs[i].attributes[0].localName;// action: start
+        res = childs[i].attributes[0].value.split("#");
+        this.agent = res[0];
+        this.state = res[1];
+      }
+    }
+
+    return {
+      action: this.action,
+      agent: this.agent,
+      state: this.state
+    }
+  }
+
+  Action.prototype.startState = function(){
     var elements = Elements;
-    that.elem.bind('click',function(){
-      //se o element for uma página ele troca
-      if(that.element == "page"){
-        book.changePage(parseInt(that.elementId));
-      }
-      //se for um state busca o agente 
-      //que ele pertence e muda o estado
-      if(that.element == "state"){
-        //peço para Elements o States usando a id do agent
-        var agent = elements.getAgent(that.agent);
-        agent.changeState(that.elementId);
-      }
-      if(that.element == "audio"){
-        var audio = Elements.getSound(that.elementId);
-        audio.start();
-      }
-    })
+    //se for um state busca o agente 
+    //que ele pertence e muda o estado
+    var agent = elements.getAgent(this.agent);
+    agent.changeState(this.state); 
   }
 
-  OnTouch.prototype.pageStart = function(page, Book){
-      Book.changePage(parseInt(page));
-  } 
-
-  OnTouch.prototype.agentStart = function(Agent, stateId){
-    var agent = Elements.getAgent(Agent);
-    agent.changeState(stateId);
+  Action.prototype.pageStart = function(Book){
+      Book.changePage(parseInt(this.state));
   }
 
-  return OnTouch;
-}());
+  return Action;
+}());//fim da Classe Action
 
-//<animation>
+/*
+* Diretiva animation
+*/
 app.directive('animation', function() {
   return {
        restrict: 'E',
@@ -295,12 +352,15 @@ app.directive('animation', function() {
           }
           var pageId = parent[0].id;
           var anim = new Animation(frames, frames.length, attr.teste, pageId, attr.left, attr.top, attr.repeat);
+          anim.setSpeed(attr.speed);
           Elements.getAnimation(anim);
        }
   };
 });
 
-//Class Animation
+/*
+* Class Animation
+*/
 var Animation = (function(){
   function Animation(frames, frameCount, speed, pageId, left, top, repeat){
     this.frames = frames;
@@ -333,6 +393,10 @@ var Animation = (function(){
           }, that.speed);
   }
 
+  Animation.prototype.setSpeed = function(speed){
+    this.speed = speed;
+  }
+
   return Animation;
 }())
 
@@ -343,14 +407,13 @@ app.directive('page', function(){
     link: function(scope, elem, attr, ctrl){
 
       elem[0].style.position = "relative";
-
       //pegar a tag fable
       var fable_elem = Elements.searchElement(elem, "fable");
       var fable_atts = fable_elem[0].attributes;//atributos fables
       var fable_width;//largura fable
       var fable_height;//altura fable
-      /*garante que o width e height do fable
-      sempre sejam definidos certos*/
+
+      /*garante que o width e height do fable sempre sejam definidos certos*/
       for(var i = 0; i < fable_atts.length; i++){
         if(fable_atts[i].nodeName == "width")
           fable_width = fable_atts[i].value;
@@ -379,7 +442,7 @@ app.directive('page', function(){
         bgSound.start();
         Elements.addSound(bgSound);
       }
-      //book.bgSoundStart(attr.bgSound);
+      //ModuleFable.getBook().bgSoundStart(attr.bgSound);
 }
   };
 });
@@ -423,44 +486,80 @@ var Agent = (function(){
   return Agent;
 }());
 
-//<audio>
+/*
+* diretiva audio
+*/
 app.directive('audio', function(){
   return{
     restrict: 'E',
     link: function(scope, elem, attr, ctrl){
       
-      console.log(elem[0].id);
-      //pegar tag source
-      var sources = elem.find("source");
-      var sound = new Sound(elem[0].id, sources,elem);
-      Elements.addSound(sound);
+      var sound = new Sound(elem[0].id, attr.src, elem);
+      var onTouch = Elements.searchElement(elem,"on-touch");
+
+      onTouch.bind('click',function(){
+        if(attr.role == "play")
+          sound.start();
+      });
     }
   }
 });
 
-//class Audio
+/*
+* Classe Sound
+* - tocar, avançar, retroceder, parar
+*/
 var Sound = (function(){
   function Sound(id, source, elem){
     this.id = id;
     this.source = source;
     this.elem = elem;
-    this.audio = 0;
+    this.audio = new Audio(source);
   }
 
   Sound.prototype.start = function(){
-    //pegar o primeiro audio e rodar
-    this.audio = new Audio(this.source);
     this.audio.play();
   }
 
   Sound.prototype.stopSound = function(){
     this.audio.pause();
   }
+  //avançar audio
+  Sound.prototype.advanceSound = function(){
 
+  }
+  //retroceder audio
+  Sound.prototype.backSound = function(){
+
+  }
   return Sound;
 }());
 
-//<property>
+/*
+* Diretiva play
+* - tocar áudios dentro do onTouch
+*/
+app.directive('play',function(){
+  return{
+    restrict: 'E',
+    link: function(scope, elem, attr, ctrl){
+      //criar elemento audio
+      if(attr.type == "audio"){
+        var media = new Audio(attr.src);
+        media.volume = 0.2;
+      }
+      
+      var onTouch = Elements.searchElement(elem,"on-touch");
+      onTouch.bind('click',function(){
+        media.play();
+      });
+    }
+  }
+})
+
+/*
+* Diretiva property
+*/
 app.directive('property',function(){
   return{
     restrict: 'E',
@@ -472,7 +571,9 @@ app.directive('property',function(){
   }
 });
 
-//class Property
+/*
+* Classe Property
+*/
 var Property = (function(){
   function Property(id, value){
     this.id = id;
@@ -490,7 +591,10 @@ var Property = (function(){
   return Property;
 }());
 
-//<set>
+/*
+* Diretiva set
+* - muda um valor de uma propriedade
+*/
 app.directive('set',function(){
   return{
     restrict: 'E',
@@ -508,6 +612,10 @@ app.directive('set',function(){
   }
 });
 
+/*
+* Classe Alert
+* - chamado dentro de um ontouch ele lança um aviso na tela
+*/
 var Alert = (function(){
   function Alert(text, elem){
     this.text = text;
@@ -521,18 +629,19 @@ var Alert = (function(){
     this.element.css({
       display: 'none',
       position: 'absolute',
-      background: 'red', 
+      background: '#bdbdbd', 
       'font-size': '30px',
       padding: '5px',
       'text-align': 'justify',
       left: '50px',
-      top: '50',
-      width:'300px'
+      top: '10px',
+      width:'300px',
+      'border-radius': '10px',
+      'border': '2px solid #455a64'
     })
   }
 
   Alert.prototype.actionAlert = function(){
-    
     if(this.flag){
       this.element[0].style.display = "block";
       this.flag = false;
@@ -565,63 +674,85 @@ app.directive('alert',function($animate){
   }
 })
 
-//<test>
+/*
+* Diretiva test
+*/
 app.directive('test',function($animate){
   return{
     restrict: 'E',
-    link: function(scope, elem, attr, ctrl){
+    link: function(scope, elem, attr){
 
       //pega o on-touch
       var onClick = Elements.searchElement(elem,"on-touch");
+      //gera mensagem
       var alert = new Alert("text",elem);
       alert.createAlert($animate);
-      //pegar o que ta no else e guardar aqui;
-      elem[0].childNodes[0].data="fueifwiuegwy";
-
+      //
+      var test = new Test(elem);  
       onClick.bind('click',function(){
         //pegar a property
         var property = Elements.getProperty(attr.target);
         //pegar value
-        var test_value = attr.value;
+        var value = attr.value;
         //pegar shout
         var shout = elem[0].children;
-        var shout_target = shout[0].attributes[0].nodeValue;
-        //
-        var xelse =elem.find("else");
-        var message = xelse.find("alert");
-        message.remove();
+        var execute = shout[0].attributes[0].nodeValue;
+        var shout_target = shout[0].attributes[1].nodeValue;
+        console.log("execute "+execute+" target"+shout_target);
         //comparar
-        if(property.getValue() == test_value){
+        if( test.compareValues(property, value) ){
+          //ações  
 
-          if(shout_target == "_END_PAGE"){
-              book.nextPage();
-            }else{
-            //pegar o shout target e fazer dele o element e elementId
-            console.log("enntrei aquiu")
-            res = shout_target.split('#');
-            var element = res[0];
-            var elementId = res[1];
-
-            //gero a ação de click em todos os elementos contidos no state
-            var state = Elements.searchElement(elem,"state");
-            var touch = new OnTouch("start", element, elementId, elem);
-            if(element == "page"){
-              touch.pageStart(elementId, book);
-            }
-            if(Elements.checkAgent(element)){
-              touch.agentStart(element, elementId);
-            }
+          //finalizar página 
+          if(execute == "endPage"){
+            console.log("Test encerra pagina");
+            //
+            ModuleFable.getBook().nextPage();
           }
-        }else{
-          //AJEITAR AQUI
-          alert.actionAlert();
-        }
+          if(execute == "changeState"){
+            console.log("Test muda estado");
+            //
+            res = shout_target.split('#');
+            var parameterOne = res[0];//agent / page
+            var parameterTwo = res[1];//state / number
+
+            test.changeState(parameterOne, parameterTwo);
+          }
+          if(execute == "changePage"){
+            //
+            res = shout_target.split('#');
+            var parameterOne = res[0];//page
+            var parameterTwo = res[1];//number
+            ModuleFable.getBook().changePage(parseInt(parameterTwo));
+          }
+        }//encerra o onClick
       })
 
     }
   }
 })
 
+/*
+* Class Test
+*/
+var Test = (function(){
+  function Test(element){
+    this.element = element;
+  }
+
+  //Recebe uma property e um value e retorna o resultado
+  Test.prototype.compareValues = function(property, value){
+    return (property.getValue() == value);
+  }
+
+  //Muda o estado de um agente dentro de um teste
+  Test.prototype.changeState = function(agent, state){
+    var agent = Elements.getAgent(agent);
+    agent.changeState(state);
+  }
+
+  return Test;
+}());
 
 //<set>
 app.directive('set',function(){
@@ -672,44 +803,55 @@ app.directive('board',function(){
   }
 })
 
-//<draggable>
+/*
+* Diretiva draggable
+*/
 app.directive('draggable', ['$document', function($document) {
   return {
+    restrict: 'AE',
     link: function(scope, element, attr) {
       var startX = 0, startY = 0, x = 0, y = 0;
+      var drag = new Drag(element[0].id, element);
+      Elements.addDrag(drag);
+
+      element.css({
+       position: 'absolute',
+       border: '1px solid red',
+       backgroundColor: 'lightgrey',
+       cursor: 'pointer'
+      });
 
       element.on('mousedown', function(event) {
-        element.css({
-         position: 'absolute',
-         border: '1px solid red',
-         backgroundColor: 'lightgrey',
-         cursor: 'pointer'
-        });
         // Prevent default dragging of selected content
+
         event.preventDefault();
         startX = event.pageX - x;
         startY = event.pageY - y;
-
         $document.on('mousemove', mousemove);
         $document.on('mouseup', mouseup);
+        //
+        dect = Elements.getDetectable(element[0].id);
       });
 
       function mousemove(event) {
-        y = event.pageY-startY/2;
-        x = event.pageX-startX/2;
+        console.log("x: "+event.pageX+" y: "+event.pageY);
+        console.log("ox: "+event.offsetX+" oy: "+event.offsetY);
+
+        y = event.pageY - startY;
+        x = event.pageX - startX;
         element.css({
           top: y + 'px',
           left:  x + 'px'
         });
+        //
+        drag.attPosition(x, y);
+        if(dect != undefined){
+          dect.checkArea();
+          dect.startEvent();
+        }
       }
 
       function mouseup() {
-        element.css({
-         position: 'absolute',
-         border: '1px solid rgba(255, 255, 255, 0.8)',
-         backgroundColor: 'lightgrey',
-         cursor: 'pointer'
-        });
         $document.off('mousemove', mousemove);
         $document.off('mouseup', mouseup);
       }
@@ -717,30 +859,111 @@ app.directive('draggable', ['$document', function($document) {
   };
 }]);
 
-//<play type="" src="">
-app.directive('play',function(){
-  return{
-    restrict: 'E',
-    link: function(scope, elem, attr, ctrl){
-      //criar elemento audio
-      if(attr.type == "audio"){
-        var media = new Audio(attr.src);
-        media.volume = 0.2;
-      }
-      
-      /*corrigir on-touch
-      - ele está sendo setado pelo state*/
-      var onTouch = Elements.searchElement(elem,"on-touch");
-      onTouch.bind('click',function(){
-        console.log("estou funcionando")
-        media.play();
-      })
+/*
+*Classe Drag
+*/
+var Drag = (function(){
+  function Drag(id,elem){
+    this.id = id;
+    this.elem = elem;
+    this.top = 0;
+    this.left = 0;
+  }
 
+  Drag.prototype.attPosition = function(x, y){
+    this.top = y;
+    this.left = x;
+    console.log("id "+this.id);
+    console.log("x:"+this.left+" y:"+this.top);
+  }
+
+  Drag.prototype.getPosition = function(){
+    return{
+      x: this.left,
+      y: this.top
+    }
+  }
+
+  return Drag;
+}());//fim da Classe Drag
+
+/** Diretiva detect
+*
+*/
+app.directive('detect',function(){
+  return{
+    restrict: 'AE',
+    link: function(scope, elem, attr){
+      var dect = new Detect(attr.target, attr.x, attr.y, attr.w, attr.h);
+      dect.setEvent(attr.event, attr.for);
+
+      if(attr.event == "changeState")
+        dect.setAgent(attr.of);
+      
+      Elements.addDetectable(dect);
     }
   }
 })
 
-//class Transition
+/*Classe Detect
+* - Responsável por detectar elementos arrastáveis
+* - Gera uma ação quando o elemento está sobre a área informada
+*/
+var Detect = (function(){
+  function Detect(id, x, y, w, h,agent){
+    this.id = id;
+    this.value = false;
+    this.x = x;
+    this.y = y;
+    this.width = w;
+    this.height = h;
+    this.action = "";
+    this.event = "";
+    this.agent = "";
+  }
+
+  Detect.prototype.setEvent = function(event, action){
+    this.action = action;
+    this.event = event;
+  }
+
+  Detect.prototype.setAgent = function(agent){
+    this.agent = agent;
+  }
+
+  Detect.prototype.startEvent = function(event,action,param1){
+    if(this.value){
+      if(this.event == "changePage")
+        ModuleFable.getBook().changePage(parseInt(this.action));
+      if(this.event == "changeState")
+        var agent = Elements.getAgent(this.agent);
+        agent.changeState(this.action);
+    }
+  }
+
+  Detect.prototype.getValue = function(){
+    console.log("dect: "+ this.value);
+    return this.value;
+  }
+
+  Detect.prototype.checkArea = function (){
+    var drag = Elements.getDrag(this.id);
+    var position = drag.getPosition();
+    var x = this.x < position.x && position.x <(this.x + this.width);
+    var y = this.y < position.y && position.y <(this.y + this.height);
+    if(x && y){
+      this.value = true;
+    }
+  }
+
+  return Detect;
+}());//fim da Classe Detect
+
+
+/*class Transition
+* - Responsável por efeitos de transições
+* - em elementos, imagens
+*/
 var Transition = (function(){
 	function Transition(elem,animateCss){
 		this.elem = elem;
@@ -771,9 +994,11 @@ var Transition = (function(){
 	}
 
 	return Transition;
-}())
+}()); //fim da Class Trasition
 
-//<transition>
+/* 
+* Diretiva transition
+*/
 app.directive('transition',function($animateCss){
   return{
     restrict: 'A',
