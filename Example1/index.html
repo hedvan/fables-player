@@ -68,17 +68,19 @@
 				<img id="floor" src="graphics/block.png" style="left: 0px; top: 550px; width: 800px ; height: 100px"/>
 				<agent id="bush1">
 					<state id="verifica">
-						<autoplay type="audio" src="graphics/bush_sound.wav">
 						<on-touch>
 							<img id="um" src="graphics/bush.png" style="position: absolute; left:50px; top:505px"/>
-							<alert>chave encontrada!</alert>
-							<play type="audio" src="graphics/bush_sound.wav">
-							<set target="hasKey" value="true">
+							<audio id="audioTeste" src="graphics/bush_sound.wav" role="play"></audio>
+							<set target="hasKey" value="true"></set>
 							<target start="bush1#verificado">
 						</on-touch>
 					</state>
 					<state id="verificado">
-						<img id="um" src="graphics/bush.png" style="position: absolute; left:50px; top:505px"/>
+						<p id="keyEntrada" draggable style="position: absolute; left:150px; top:305px"> key </p>
+						<on-touch>
+							<alert on-start="true">chave encontrada!</alert>
+							<img id="um" src="graphics/bush.png" style="position: absolute; left:50px; top:505px"/>
+						</on-touch>
 					</state>
 				</agent>
 				<agent id="bush2">
@@ -90,9 +92,9 @@
 						</on-touch>
 					</state>
 					<state id="verificado">
-						<p id="keyEntrada" draggable style="position: absolute; left:150px; top:305px"> key </p>
 						<on-touch>
-						<img id="um" src="graphics/bush.png" style="position: absolute; left:150px; top:505px"/>
+							<audio id="audioTeste" src="graphics/bush_sound.wav" role="play"></audio>
+							<img id="um" src="graphics/bush.png" style="position: absolute; left:150px; top:505px"/>
 							<alert>já olhei</alert>
 						</on-touch>
 					</state>
@@ -171,11 +173,11 @@
 						<img id="caixa" src="graphics/box.png" 
 						style="position: absolute; left: 600px; top: 200px; 
 						width: 120px ; height: 120px">
-						<alert>Você encontrou um elixir da vida!!</alert>
 						<target start="caixa2#aberta"></target>
 					</on-touch>
 				</state>
 				<state id="aberta">
+					<alert on-start="true">Você encontrou um elixir da vida!!</alert>
 					<img id="caixa" src="graphics/box.png" 
 						transition-fade-out
 						style="position: absolute; left: 600px; top: 200px; 
@@ -235,17 +237,17 @@
 					<board set-class="classic-board" width="400px" height="200px" left="200px" top="100px" color="white">
 						Você me salvou primeiro cavaleiro!! Obrigado!!
 					</board>
-					<animation speed="10" top="430px" left="600px" repeat="yes" width="100px" height="130px">
-						<img src="graphics/animation-walk/walk1.png"></img>
-						<img src="graphics/animation-walk/walk2.png"></img>
-						<img src="graphics/animation-walk/walk3.png"></img>
-						<img src="graphics/animation-walk/walk4.png"></img>
-						<img src="graphics/animation-walk/walk5.png"></img>
-						<img src="graphics/animation-walk/walk6.png"></img>
-						<img src="graphics/animation-walk/walk7.png"></img>
-						<img src="graphics/animation-walk/walk8.png"></img>
-						<img src="graphics/animation-walk/walk9.png"></img>
-						<img src="graphics/animation-walk/walk10.png"></img>
+					<animation speed="50" top="430px" left="600px" repeat="yes" width="100px" height="130px">
+						<img src="graphics/animation-jump/Idle1.png"></img>
+						<img src="graphics/animation-jump/Idle2.png"></img>
+						<img src="graphics/animation-jump/Idle3.png"></img>
+						<img src="graphics/animation-jump/Idle4.png"></img>
+						<img src="graphics/animation-jump/Idle5.png"></img>
+						<img src="graphics/animation-jump/Idle6.png"></img>
+						<img src="graphics/animation-jump/Idle7.png"></img>
+						<img src="graphics/animation-jump/Idle8.png"></img>
+						<img src="graphics/animation-jump/Idle9.png"></img>
+						<img src="graphics/animation-jump/Idle10.png"></img>
 					</animation>
 				</state>
 				<!--estado do amigo morrendo-->

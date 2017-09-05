@@ -621,6 +621,7 @@ var Alert = (function(){
     this.text = text;
     this.element = elem;
     this.flag = true;
+    elem[0].style.display = "none";
   }
 
   Alert.prototype.createAlert = function($animate){
@@ -637,7 +638,8 @@ var Alert = (function(){
       top: '10px',
       width:'300px',
       'border-radius': '10px',
-      'border': '2px solid #455a64'
+      'border': '2px solid #455a64',
+      'z-index': '1'
     })
   }
 
@@ -665,6 +667,9 @@ app.directive('alert',function($animate){
         var text = elem[0].childNodes[0].data;
         var alert = new Alert(text,elem);
         alert.createAlert($animate);
+
+        if(attr.onStart != undefined)
+          alert.actionAlert();
 
         var onTouch = elem.parent();
         onTouch.bind('click',function(){
