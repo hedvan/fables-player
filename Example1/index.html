@@ -63,8 +63,8 @@
 					<p>Após sete dias e sete noite de viagem, o cavaleiro chegou a caverna.
 					   Agora precisa encontrar a chave da entrada que está escondida na vegetação local.</p>
 				</div>
-				<img id="bloco" src="graphics/block.png" style="left: 300px; top: 300px; width: 480px ; height: 500px"/>
-				<img src="graphics/char1.png" width="100" height="130" style="left: 100px; top: 430px"></img>
+				<img id="bloco" src="graphics/block.png" width="480" height="500" x="300" y="300"/>
+				<img src="graphics/char1.png" width="100" height="130" x="100" y="430"></img>
 				<img id="floor" src="graphics/block.png" style="left: 0px; top: 550px; width: 800px ; height: 100px"/>
 				<agent id="bush1">
 					<state id="verifica">
@@ -76,7 +76,7 @@
 						</on-touch>
 					</state>
 					<state id="verificado">
-						<p id="keyEntrada" draggable style="position: absolute; left:150px; top:305px"> key </p>
+						<img id="keyEntrada" src="graphics/key.png" draggable x="150" y="305" width="40" height="20">
 						<on-touch>
 							<alert on-start="true">chave encontrada!</alert>
 							<img id="um" src="graphics/bush.png" style="position: absolute; left:50px; top:505px"/>
@@ -156,57 +156,47 @@
 						<img id="caixa" src="graphics/box.png" 
 						style="position: absolute; left: 200px; top: 200px; 
 						width: 120px ; height: 120px">
-						<alert>caixa vazia</alert>
 						<target start="caixa1#aberta">
 					</on-touch>
 				</state>
 				<state id="aberta">
-					<img  draggable id="caixa" src="graphics/box.png"
-						style="position: absolute; left: 200px; top: 200px; 
-						width: 120px ; height: 120px">
+					<img transition="fadeOut" id="caixa" src="graphics/box.png" x="200" y="200" width="120" height="120"/>
 				</state>
 			</agent>
 			<agent id="caixa2">
 				<state id="fechada">
 					<on-touch>
 						<set target="antidote" value="true"></set>
-						<img id="caixa" src="graphics/box.png" 
-						style="position: absolute; left: 600px; top: 200px; 
-						width: 120px ; height: 120px">
+						<img id="caixa" src="graphics/box.png" x="600" y="200" width="120" height="120">
 						<target start="caixa2#aberta"></target>
 					</on-touch>
 				</state>
 				<state id="aberta">
-					<alert on-start="true">Você encontrou um elixir da vida!!</alert>
-					<img id="caixa" src="graphics/box.png" 
-						transition-fade-out
-						style="position: absolute; left: 600px; top: 200px; 
-						width: 120px ; height: 120px">
-					<alert>já olhei essa caixa</alert>
+					<img transition="fadeOut" id="caixa" src="graphics/box.png" x="600" y="200" width="120" height="120"/>
+					<on-touch>
+						<img  src="graphics/mush.png" x="600" y="200" width="60" height="60"/>
+						<alert>Elixir encontrado</alert>
+						<target start="elixir#encontrado"></target>
+					</on-touch>
 				</state>
 			</agent>
+			
 			<agent id="caixa3">
 				<state id="fechada">
 					<on-touch>
-						<img id="caixa" src="graphics/box.png" 
-						style="position: absolute; left: 350px; top: 350px; 
-						width: 120px ; height: 120px">
+						<img id="caixa" src="graphics/box.png"  x="350" y="350" width="120" height="120">
 						<alert>caixa vazia</alert>
 						<target start="caixa3#aberta">
 					</on-touch>
 				</state>
 				<state id="aberta">
-					<img id="caixa" src="graphics/box.png"
-						transition-fade-out 
-						style="position: absolute; left: 350px; top: 350px; 
-						width: 120px ; height: 120px">
-					<alert>já olhei essa caixa</alert>
+					<img id="caixa" src="graphics/box.png" transition="fadeOut" x="350" y="350" width="120" height="120">
 				</state>
 			</agent>
 			<agent id="porta_esquerda">
 				<state>
 					<on-touch>
-						<img id="porta_esquerda" src="graphics/DoorOpen.png" style="position: absolute; left: 50px; top: 400px; width: 80px ; height: 140px"/>
+						<img id="porta_esquerda" src="graphics/DoorOpen.png" x="50" y="400" width="80" height="140"/>
 						<target start="page#3">
 					</on-touch>
 				</state>
@@ -216,7 +206,7 @@
 			<!--Página 5--Saida-->
 			<page id="5" bg-image="graphics/graveyard.png">
 			<img id="floor" src="graphics/futuretile.png" style="position: absolute; left: 0px; top: 550px; width: 800px ; height: 100px"/>
-			<img src="graphics/char1.png" width="100" height="130" style="position: absolute; left: 200px; top: 430px"/>
+			<img src="graphics/char1.png" width="100" height="130" x="200" y="430"/>
 			<agent id="amigo">
 				<state id="parado">
 					<board set-class="classic-board" font-size="30px" left="200px" top="100px" color="white">

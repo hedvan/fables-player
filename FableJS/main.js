@@ -137,7 +137,14 @@ var Elements = (function(){
   }
 }());
 
-//Class Book
+/*Class Book
+* - Contém: páginas, página atual
+* - Ações:
+*     - guardar páginas
+*     - trocar de página
+*     - ir para próxima ou anterior página
+*     - checa visibilidade da página
+*/
 var Book =(function(){
   //Construtor
   function Book(){
@@ -225,7 +232,7 @@ app.directive('fable', function() {
 });
 
 /* Módulo Fabulas
-* - guarda informações sobre o tamanho da tela
+* 
 */
 var ModuleFable = (function(){
   var book;
@@ -245,7 +252,10 @@ var ModuleFable = (function(){
   }
 }());//Fim do módulo Canvas
 
-//diretiva <on-touch>
+/*diretiva <on-touch>
+* Contém diretivas: test, target(para troca de página), alert
+*                   set, play, audio
+*/
 app.directive('onTouch', function() {
   return {
        restrict: 'E',
@@ -507,7 +517,7 @@ app.directive('audio', function(){
 
 /*
 * Classe Sound
-* - tocar, avançar, retroceder, parar
+* - Ações que devem ser efetudas: tocar, avançar, retroceder, parar
 */
 var Sound = (function(){
   function Sound(id, source, elem){
@@ -668,8 +678,6 @@ app.directive('alert',function($animate){
         var alert = new Alert(text,elem);
         alert.createAlert($animate);
 
-        if(attr.onStart != undefined)
-          alert.actionAlert();
 
         var onTouch = elem.parent();
         onTouch.bind('click',function(){
@@ -808,6 +816,55 @@ app.directive('board',function(){
   }
 })
 
+//diretivas de posição
+app.directive('x',function(){
+  return{
+    restrict: 'A',
+    link: function(scope, elem, attr, ctrl){
+      elem.css({
+        position: 'absolute', 
+        left: attr.x+'px'
+      })
+    }
+  }
+})
+
+app.directive('y',function(){
+  return{
+    restrict: 'A',
+    link: function(scope, elem, attr, ctrl){
+      elem.css({
+        position: 'absolute', 
+        top: attr.y+'px'
+      })
+    }
+  }
+})
+
+app.directive('width',function(){
+  return{
+    restrict: 'A',
+    link: function(scope, elem, attr, ctrl){
+      elem.css({
+        position: 'absolute', 
+        width: attr.width+'px'
+      })
+    }
+  }
+})
+
+app.directive('height',function(){
+  return{
+    restrict: 'A',
+    link: function(scope, elem, attr, ctrl){
+      elem.css({
+        position: 'absolute', 
+        height: attr.height+'px'
+      })
+    }
+  }
+})
+
 /*
 * Diretiva draggable
 */
@@ -815,16 +872,9 @@ app.directive('draggable', ['$document', function($document) {
   return {
     restrict: 'AE',
     link: function(scope, element, attr) {
-      var startX = 0, startY = 0, x = 0, y = 0;
+      var startX = 0, startY = 0, x = attr.x, y = attr.y;
       var drag = new Drag(element[0].id, element);
       Elements.addDrag(drag);
-
-      element.css({
-       position: 'absolute',
-       border: '1px solid red',
-       backgroundColor: 'lightgrey',
-       cursor: 'pointer'
-      });
 
       element.on('mousedown', function(event) {
         // Prevent default dragging of selected content
