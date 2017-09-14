@@ -350,10 +350,10 @@ app.directive('animation', function() {
 
           if(attr.width != "" && attr.height != ""){
             for(var i = 0; i < frames.length; i++){
-              frames[i].style.width = attr.width;
-              frames[i].style.height = attr.height;
-              frames[i].style.left = attr.left;
-              frames[i].style.top = attr.top;
+              frames[i].style.width = attr.width+"px";
+              frames[i].style.height = attr.height+"px";
+              frames[i].style.left = attr.left+"px";
+              frames[i].style.top = attr.top+"px";
             }
           }
           var parent = elem.parent();
@@ -503,8 +503,11 @@ app.directive('audio', function(){
   return{
     restrict: 'E',
     link: function(scope, elem, attr, ctrl){
-      
-      var sound = new Sound(elem[0].id, attr.src, elem);
+      var sound = undefined;
+      //se elemento não existe cria um novo
+      sound = Elements.getSound(attr.id);
+      if(sound == undefined)
+        sound = new Sound(elem[0].id, attr.src, elem);
       var onTouch = Elements.searchElement(elem,"on-touch");
 
       onTouch.bind('click',function(){
@@ -536,11 +539,15 @@ var Sound = (function(){
   }
   //avançar audio
   Sound.prototype.advanceSound = function(){
-
+    if(this.audio.ended)
+      this.audio.currentTime = 0;
+    this.audio.currentTime++;
   }
   //retroceder audio
   Sound.prototype.backSound = function(){
-
+    if(this.audio.ended)
+      this.audio.currentTime = 0;
+    this.audio.currentTime--;
   }
   return Sound;
 }());
@@ -793,12 +800,6 @@ app.directive('board',function(){
     restrict: 'E',
     link: function(scope, elem, attr, ctrl){
       //estilização da board
-      var left = attr.left;
-      if(left == undefined)
-        left = "10px";
-      var top = attr.top;
-      if(top == undefined)
-        top = "10px";
       if(attr.fontSize == undefined)
         attr.fontSize = "25px";
       elem.css({
@@ -808,9 +809,6 @@ app.directive('board',function(){
         'font-size': attr.fontSize,
         padding: '5px',
         'text-align': 'justify',
-        left: left,
-        top: top,
-        width:'300px',
       })
     }
   }
