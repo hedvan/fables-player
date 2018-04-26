@@ -1,23 +1,21 @@
-/**
-* criação da mudança de estado do agent
-* 
-*/
-
-
-
 var app = angular.module("FablePlayer",['simple-sprite']);
 
-//Module Elements
+/*
+* ------------------ STORAGE ELEMENTS -----------------------------
+*
+*/
 var Elements = (function(){
   /**
   * Arrays que guardam os objetos do Fables
   */
+  var Book;
   var animations = new Array();
   var agents = new Array();
   var sounds = new Array();
   var properties = new Array();
   var draggable = new Array();
   var detectable = new Array();
+  var alerts = new Array();
 
   //guarda um objeto Animation
   var getAnimation = function(animation){
@@ -85,6 +83,7 @@ var Elements = (function(){
     draggable.push(drag);
   }
 
+  
   //retorna drag
   var getDrag = function(id){
     for(var i = 0; i < draggable.length; i++){
@@ -106,6 +105,20 @@ var Elements = (function(){
     }
   }
 
+  var addAlert = function(alert){
+    alerts.push(alert);
+  }
+
+  var getAlert = function(agentNameState){
+   
+   for(var i = 0; i < alerts.length; i++){
+      if(alerts[i].agentNameState == agentNameState){
+        console.log("achei algo");
+        return alerts[i];
+      }
+    } 
+  }
+
   //Procura a tag na qual desejo manipular
   var searchElement = function(elem, type){
     var parent = elem.parent();
@@ -117,6 +130,14 @@ var Elements = (function(){
       }
     }
     return parent;
+  }
+
+  var setBook = function(book2){
+    Book = book2;
+  }
+
+  var getBook = function(){
+    return Book;
   }
 
   return{
@@ -133,284 +154,114 @@ var Elements = (function(){
     addDrag: addDrag,
     getDrag: getDrag,
     addDetectable: addDetectable,
-    getDetectable: getDetectable
+    getDetectable: getDetectable,
+    setBook: setBook,
+    getBook: getBook,
+    addAlert: addAlert,
+    getAlert: getAlert
   }
 }());
 
-/*Class Book
-* - Contém: páginas, página atual
-* - Ações:
-*     - guardar páginas
-*     - trocar de página
-*     - ir para próxima ou anterior página
-*     - checa visibilidade da página
+var UtilsFunction = (function(){
+
+  var getAgentAndChangeState = function(agentName,stateName){
+    var agent = Elements.getAgent(agentName);
+    agent.changeState(stateName);
+  }
+
+  return{
+    getAgentAndChangeState: getAgentAndChangeState,
+  }
+
+}());
+
+/*
+*  ------------- CLASS BOOK -------------------------------
 */
-var Book =(function(){
-  //Construtor
-  function Book(){
+app.factory('Book',function(){
+  return function(){
     this.pages = new Array();
     this.currentPage = 1;
     this.sound;
-  }
+    console.log("Book iniciou");
 
-  //Adiciona uma página ao livro
-  Book.prototype.addPage = function(page){
-    this.pages.push(page);
-  }
+    this.addPage = function(page){
+      this.pages.push(page);
+    }
 
-  //Troca de página
-  Book.prototype.changePage = function(number){
-    if(number <= this.pages.length){
-      var sound = Elements.getSound("bgSound"+this.currentPage);
-      if(sound != undefined)
-        sound.stopSound();
-      this.currentPage = number;
-      this.checkPage();
-    }else{
-      alert("ultima pagina");
+    this.changePage = function(number){
+      if(number <= this.pages.length){
+        var sound = Elements.getSound("bgSound"+this.currentPage);
+        if(sound != undefined)
+          sound.stopSound();
+        this.currentPage = number;
+        this.checkPage();
+      }else{
+        alert("ultima pagina");
+      }
+    }
+
+    this.checkPage = function(){
+      for(var i = 0; i < this.pages.length; i++){
+            if(this.currentPage == this.pages[i].id){
+                this.pages[i].page.style.display = "block";
+            }else{
+                this.pages[i].page.style.display = "none";
+            }
+      }
+      Elements.checkAnimation(this.currentPage);
+    }
+
+    this.nextPage = function(){
+      this.changePage(this.currentPage+1);
+    }
+
+    this.previousPage = function(){
+      this.changePage(this.currentPage-1);
     }
   }
+});
 
-  //muda a visibilidade das páginas
-  Book.prototype.checkPage = function(){
-    for(var i = 0; i < this.pages.length; i++){
-          if(this.currentPage == this.pages[i].id){
-              this.pages[i].page.style.display = "block";
-          }else{
-              this.pages[i].page.style.display = "none";
-          }
-    }
-    Elements.checkAnimation(this.currentPage);
-  }
-
-  //avança para a próxima
-  Book.prototype.nextPage = function(){
-    ModuleFable.getBook().changePage(this.currentPage+1);
-  }
-
-  //retorna a página anterior
-  Book.prototype.previousPage = function(){
-    this.changePage(this.currentPage-1);
-  }
-
-  return Book;
-}());//Fim da classe Book
-
-//isolar livro no modulo
-//var ModuleFable.getBook() = new Book();//Cria um livro
-
-//diretiva <fable>
-app.directive('fable', function() {
+/*
+* ------------- DIRETIVA FABLE -------------------------------
+*/
+app.directive('fable', function(Book,AudioFactory) {
   return {
       restrict: 'E',
       transclude: true,
-  	  scope: {
+      scope: {
         width: '@width',
         height: '@height'
       },
       link:function(scope,elem,attr){
         //iniciando o fábulas
-        var book = ModuleFable.initializeBook();
+        var book = new Book();
         
         var list = elem.find("page");
         //pega todos os elementos page e salva em um array
         for(var i = 0; i < list.length; i++){
-        	book.addPage({id: list[i].id, page: list[i]});
+          book.addPage({id: list[i].id, page: list[i]});
         }
         book.checkPage();
 
         /*Criando audio background para todas as páginas*/
         if(attr.bgSound != undefined){
-          var bgSound = new Sound("bgSound"+attr.id,attr.bgSound, elem);
+          var bgSound = new AudioFactory("bgSound"+attr.id,attr.bgSound, elem);
           bgSound.start();
           Elements.addSound(bgSound);
         }
 
+        Elements.setBook(book);//salvando livro
       },
       template: '<div class="container">'+'<div class="box" style="width:{{width}}; height:{{height}}" ng-transclude>'+'</div>'
+
   };
 });
 
-/* Módulo Fabulas
-* 
-*/
-var ModuleFable = (function(){
-  var book;
-
-  var initializeBook = function(){
-    book = new Book();
-    return book;
-  }
-
-  var getBook = function(){
-    return book;
-  }
-
-  return{
-    getBook: getBook,
-    initializeBook: initializeBook
-  }
-}());//Fim do módulo Canvas
-
-/*diretiva <on-touch>
-* Contém diretivas: test, target(para troca de página), alert
-*                   set, play, audio
-*/
-app.directive('onTouch', function() {
-  return {
-       restrict: 'E',
-       link:function(scope, elem, attr){
-          //identificar o tipo do elemento
-          var childs = elem.children();
-          //pegando a tag agent
-          function getParent(){
-            var parent = elem.parent();
-            while((parent[0].localName != "agent" && parent[0].localName != "page")){
-              parent = parent.parent();
-            }
-            return parent;
-          }
-          var parent = getParent();
-
-          var act = new Action(elem);
-          var actData = act.setAgentAndStateAndAction(childs);
-
-          elem.bind('click',function(){
-            if(actData.action == "start"){
-              if(actData.agent == "page")
-                act.pageStart(ModuleFable.getBook());//troca de página
-              
-              if(Elements.checkAgent(actData.agent))
-                act.startState();//muda de state
-            }
-          })
-          
-       }
-  };
-});
-
-/*Class Action
-* - Executa as ações do livro como mudar de página
-* - Alterar estado de um elemento
-* - atualizar um agente
-*/
-var Action = (function(){
-  function Action(elem){
-    this.action = "";//action = start
-    this.agent = "";//element = agent
-    this.elem = elem;
-    this.state = "";//elementId = state
-  }
-
-  Action.prototype.setAgentAndStateAndAction = function(childs){
-    for(var i = 0; i < childs.length; i++){
-      if(childs[i].tagName == "TARGET"){
-        this.action = childs[i].attributes[0].localName;// action: start
-        res = childs[i].attributes[0].value.split("#");
-        this.agent = res[0];
-        this.state = res[1];
-      }
-    }
-
-    return {
-      action: this.action,
-      agent: this.agent,
-      state: this.state
-    }
-  }
-
-  Action.prototype.startState = function(){
-    var elements = Elements;
-    //se for um state busca o agente 
-    //que ele pertence e muda o estado
-    var agent = elements.getAgent(this.agent);
-    agent.changeState(this.state); 
-  }
-
-  Action.prototype.pageStart = function(Book){
-      Book.changePage(parseInt(this.state));
-  }
-
-  return Action;
-}());//fim da Classe Action
 
 /*
-* Diretiva animation
+* ------------- DIRETIVA PAGE -------------------------------
 */
-app.directive('animation', function() {
-  return {
-       restrict: 'E',
-       scope: {
-        x: '@x',
-        y: '@y' ,
-        speed: '@speed'
-       },
-       link:function(scope,elem,attr,ctrl){  
-          var frames = elem.children();
-
-          if(attr.width != "" && attr.height != ""){
-            for(var i = 0; i < frames.length; i++){
-              frames[i].style.width = attr.width+"px";
-              frames[i].style.height = attr.height+"px";
-              frames[i].style.left = attr.left+"px";
-              frames[i].style.top = attr.top+"px";
-            }
-          }
-          var parent = elem.parent();
-          while(parent[0].localName != "page"){
-            parent = parent.parent();
-          }
-          var pageId = parent[0].id;
-          var anim = new Animation(frames, frames.length, attr.teste, pageId, attr.left, attr.top, attr.repeat);
-          anim.setSpeed(attr.speed);
-          Elements.getAnimation(anim);
-       }
-  };
-});
-
-/*
-* Class Animation
-*/
-var Animation = (function(){
-  function Animation(frames, frameCount, speed, pageId, left, top, repeat){
-    this.frames = frames;
-    this.frameCount = frameCount;
-    this.speed = speed;
-    this.pageId = pageId;
-    this.left = left;
-    this.top = top;
-    this.repeat = repeat;
-    for(var i = 0; i < frames.length; i++)
-      this.frames[i % this.frameCount].style.display = "none";
-  }
-
-  Animation.prototype.start = function(){
-    var i = 0;
-    var that = this;
-    if (that.speed === 0|| that.speed === null || that.speed === undefined)
-            that.speed = 100;
-
-    var interval = setInterval(function () {        
-              that.frames[i % that.frameCount].style.display = "none"; 
-              that.frames[++i % that.frameCount].style.display = "block";
-              that.frames[i % that.frameCount].style.left = that.left+'px';
-              that.frames[i % that.frameCount].style.top = that.top+'px';
-              that.frames[i % that.frameCount].style.position = 'absolute';
-
-              if(i==(that.frames.length-1) && that.repeat == "no")
-                clearInterval(interval);
-
-          }, that.speed);
-  }
-
-  Animation.prototype.setSpeed = function(speed){
-    this.speed = speed;
-  }
-
-  return Animation;
-}())
-
-//<page>
 app.directive('page', function(){
   return{
     restrict: 'E',
@@ -457,14 +308,54 @@ app.directive('page', function(){
   };
 });
 
-//<agent>
-app.directive('agent', function(){
+/* ------------- CLASS ACTION -------------------------------
+* - Executa as ações do livro como mudar de página
+* - Alterar estado de um elemento
+* - atualizar um agente
+*/
+
+app.factory('ActionFactory', function() {
+    return function(elem) {
+        //Contructor
+        this.action = "";
+        this.agent = "";
+        this.stat = "";
+        this.elem = elem;
+        //
+
+        this.setAgent = function(agentName){
+          this.agent = agentName;
+        }
+
+        this.setState = function(stateName){
+          this.state = stateName;
+        }
+
+        this.changeState = function(agentName, stateName){
+          console.log("changeState");
+          var elements = Elements;
+          //se for um state busca o agente 
+          //que ele pertence e muda o estado
+          var agent = elements.getAgent(this.agent);
+          agent.changeState(this.state); 
+        }
+
+        this.pageStart = function(Book){
+            Book.changePage(parseInt(this.state));
+        }
+    };
+});
+
+/*
+* ------------- DIRETIVA AGENT -------------------------------
+*/
+app.directive('agent', function(AgentFactory){
   return{
     restrict: 'E',
     link: function(scope, elem, attr, ctrl){
       //capturar state
       var states = elem.find("state");
-      var state = new Agent(states, elem, attr.id);
+      var state = new AgentFactory(states, elem, attr.id);
       for(var i=1;i<states.length;i++){
         states[i].remove();
       }
@@ -474,32 +365,236 @@ app.directive('agent', function(){
   }
 });
 
-//Class Agent
-var Agent = (function(){
-  function Agent(states, elem, id){
+app.factory('AgentFactory',function(){
+  return function(states, elem, id){
+    //
     this.elem = elem;
     this.array = states;
-    this.id = id; //id do agent
-  }
-
-  Agent.prototype.changeState = function(id){
-    console.log("meu id "+this.id);
-    for(var i=0; i < this.array.length; i++){
-      if(this.array[i].id == id){
-        this.elem.after(this.array[i]);//coloca no html o trecho
+    this.id = id; 
+    //
+    this.changeState = function(id){
+      console.log("Func changeState");
+         
+      console.log("meu id "+this.id);
+      for(var i=0; i < this.array.length; i++){
+        if(this.array[i].id == id){
+          this.elem.after(this.array[i]);//coloca no html o trecho
+        }
+        else
+          this.array[i].remove();//retira os estados não usados      
       }
-      else
-        this.array[i].remove();//retira os estados não usados      
     }
   }
-
-  return Agent;
-}());
+});
 
 /*
-* diretiva audio
+* ------------- DIRETIVA ANIMATION -------------------------------
 */
-app.directive('audio', function(){
+app.factory('AnimationFactory',function(){
+  return function(frames, frameCount, speed, pageId, left, top, repeat){
+    //
+    this.frames = frames;
+    this.frameCount = frameCount;
+    this.speed = speed;
+    this.pageId = pageId;
+    this.left = left;
+    this.top = top;
+    this.repeat = repeat;
+    for(var i = 0; i < frames.length; i++)
+      this.frames[i % this.frameCount].style.display = "none";
+    //
+
+    this.start = function(){
+      var i = 0;
+      var that = this;
+      if (that.speed === 0|| that.speed === null || that.speed === undefined)
+              that.speed = 100;
+
+      var interval = setInterval(function () {        
+                that.frames[i % that.frameCount].style.display = "none"; 
+                that.frames[++i % that.frameCount].style.display = "block";
+                that.frames[i % that.frameCount].style.left = that.left+'px';
+                that.frames[i % that.frameCount].style.top = that.top+'px';
+                that.frames[i % that.frameCount].style.position = 'absolute';
+
+                if(i==(that.frames.length-1) && that.repeat == "no")
+                  clearInterval(interval);
+
+            }, that.speed);
+    }
+
+    this.setSpeed = function(speed){
+      this.speed = speed;
+    }
+  }
+});
+
+app.directive('animation', function(AnimationFactory) {
+  return {
+       restrict: 'E',
+       link:function(scope,elem,attr,ctrl){  
+          var frames = elem.children();
+
+          if(attr.width != "" && attr.height != ""){
+            for(var i = 0; i < frames.length; i++){
+              frames[i].style.width = attr.width+"px";
+              frames[i].style.height = attr.height+"px";
+              frames[i].style.left = attr.x+"px";
+              frames[i].style.top = attr.y+"px";
+            }
+          }
+          var parent = elem.parent();
+          while(parent[0].localName != "page"){
+            parent = parent.parent();
+          }
+          var pageId = parent[0].id;
+          var anim = new AnimationFactory(frames, frames.length, attr.teste, pageId, attr.left, attr.top, attr.repeat);
+          anim.setSpeed(attr.speed);
+          Elements.getAnimation(anim);
+       }
+  };
+});
+
+
+/* ------------- DIRETIVA ONTOUCH -------------------------------
+* Contém diretivas: test, target(para troca de página), alert
+*                   set, play, audio
+*/
+app.directive('onTouch', function($animate,$timeout,ActionFactory) {
+  return {
+       restrict: 'E',
+       link:function(scope, elem, attr){
+          //
+          var agentNameID;
+          var alert = false;
+          var target = false;
+          var changeTo = false;
+          var agentTag;
+          var stateTag;
+          var action;
+          var nextState;
+          var emit;
+          var emitEvent;
+          var emitPageValue;
+          //identificar o tipo do elemento
+          var childs = elem.children();
+          var functionsTriggeredOnTouch = new Array();
+          
+          //pegando a tag parent
+          var getTagParent = function(parentName){
+            var parent = elem.parent();
+            try{
+              if(parent[0].localName != parentName){
+                while((parent[0].localName != parentName)){
+                 parent = parent.parent();
+                }
+              }
+            }catch(error){
+              console.log("estourou o limite");
+            } 
+            return parent;
+          }
+
+          //check if existis alert,target exists
+          var checkChildsState = function(){
+            var getAttribute = function(attributes,attributeName){
+              for(var i = 0; i < attributes.length; i++){
+                if(attributes[i].name == attributeName)
+                  return attributes[i].value;
+              }
+            }
+
+            for(var i = 0; i < childs.length; i++){
+              if(childs[i].localName == "alert")
+                alert = true;
+              if(childs[i].localName == "target")
+                target = true;
+              if(childs[i].localName == "changeto"){
+                changeTo = true;
+                agentTag = getTagParent("agent");
+                nextState = getAttribute(childs[i].attributes, "target");
+              }
+              if(childs[i].localName == "emit"){
+                emit = true; 
+                emitEvent =  getAttribute(childs[i].attributes, "event");
+                emitPageValue =  getAttribute(childs[i].attributes, "number"); 
+              }
+            }
+          }
+          checkChildsState();
+
+          
+
+          var changeStateFunction = function(){
+            if(changeTo){ 
+              UtilsFunction.getAgentAndChangeState(agentTag[0].id,nextState);
+            }
+          }
+
+          var alertFunction = function(){
+            for (var i=0; i < childs.length; i++){
+              if(childs[i].localName == "alert"){
+                var alert = Elements.getAlert(childs[i].id);
+                alert.actionAlert();
+              }
+            }
+          }
+
+          var emitFunction = function(){
+            var nextPage = {id:'next_page',
+            start: function(){
+                var book = Elements.getBook();
+                book.nextPage();
+              }
+            }
+
+            var previousPage = { id: 'previous_page',
+              start: function(){
+                var book = Elements.getBook();
+                book.previousPage();
+              }
+            }
+
+            var gotoPage = { id: 'goto_page',
+              start: function(){
+                var book = Elements.getBook();
+                book.changePage(emitPageValue);
+              }
+            }
+
+            var basicFunctions = [nextPage,previousPage,gotoPage];
+
+            console.log("nome do evento: " + emitEvent);  
+            for(var i = 0; i < basicFunctions.length; i++){
+              if(basicFunctions[i].id == emitEvent)
+                basicFunctions[i].start();
+            }
+          }
+
+          var organizeFunctions = function(){
+            if(alert)
+              functionsTriggeredOnTouch.push(alertFunction); 
+            if(changeTo)
+              functionsTriggeredOnTouch.push(changeStateFunction);  
+            if(emit)
+              functionsTriggeredOnTouch.push(emitFunction);           
+          }
+          organizeFunctions();
+          
+          elem.on('click',function($event){
+            for(var i = 0; i < functionsTriggeredOnTouch.length; i++){
+              functionsTriggeredOnTouch[i]();
+            }
+          });
+          
+       }
+  };
+});
+
+/*
+* ------------- DIRETIVA AUDIO -------------------------------
+*/
+app.directive('audio', function(AudioFactory){
   return{
     restrict: 'E',
     link: function(scope, elem, attr, ctrl){
@@ -507,9 +602,9 @@ app.directive('audio', function(){
       //se elemento não existe cria um novo
       sound = Elements.getSound(attr.id);
       if(sound == undefined)
-        sound = new Sound(elem[0].id, attr.src, elem);
-      var onTouch = Elements.searchElement(elem,"on-touch");
+        sound = new AudioFactory(elem[0].id, attr.src, elem);
 
+      var onTouch = Elements.searchElement(elem,"on-touch");
       onTouch.bind('click',function(){
         if(attr.role == "play")
           sound.start();
@@ -519,41 +614,40 @@ app.directive('audio', function(){
 });
 
 /*
-* Classe Sound
-* - Ações que devem ser efetudas: tocar, avançar, retroceder, parar
+* ------------- CLASS AUDIO -------------------------------
 */
-var Sound = (function(){
-  function Sound(id, source, elem){
+app.factory('AudioFactory', function(){
+  return function(id, source, elem){
     this.id = id;
     this.source = source;
     this.elem = elem;
     this.audio = new Audio(source);
-  }
 
-  Sound.prototype.start = function(){
-    this.audio.play();
-  }
+    this.start = function(){
+      this.audio.play();
+    }
 
-  Sound.prototype.stopSound = function(){
-    this.audio.pause();
+    this.stopSound = function(){
+      this.audio.pause();
+    }
+
+    this.advanceSound = function(){
+      if(this.audio.ended)
+        this.audio.currentTime = 0;
+      this.audio.currentTime++;
+    }
+
+    this.backSound = function(){
+      if(this.audio.ended)
+        this.audio.currentTime = 0;
+      this.audio.currentTime--;
+    }
+
   }
-  //avançar audio
-  Sound.prototype.advanceSound = function(){
-    if(this.audio.ended)
-      this.audio.currentTime = 0;
-    this.audio.currentTime++;
-  }
-  //retroceder audio
-  Sound.prototype.backSound = function(){
-    if(this.audio.ended)
-      this.audio.currentTime = 0;
-    this.audio.currentTime--;
-  }
-  return Sound;
-}());
+})
 
 /*
-* Diretiva play
+* ------------- DIRETIVA PLAY -------------------------------
 * - tocar áudios dentro do onTouch
 */
 app.directive('play',function(){
@@ -574,14 +668,225 @@ app.directive('play',function(){
   }
 })
 
+
+
+
 /*
-* Diretiva property
+* ------------- DIRETIVA TEST -------------------------------
 */
-app.directive('property',function(){
+app.directive('test',function($animate,TestFactory,AlertFactory){
+  return{
+    restrict: 'E',
+    link: function(scope, elem, attr){
+
+      //pega o on-touch
+      var onClick = Elements.searchElement(elem,"on-touch");
+      var agent = Elements.searchElement(elem,"agent");
+
+      //gera mensagem
+      var alert = new AlertFactory("text",elem);
+      alert.createAlert($animate);
+      //
+      var test = new TestFactory(elem);  
+      onClick.bind('click',function(){
+        //pegar a property
+        var property = Elements.getProperty(attr.target);
+        //pegar value
+        var value = attr.value;
+        //pegar parametros do execute
+        var execute = elem[0].children; 
+        var action = execute[0].attributes[0].nodeValue;
+        var target = execute[0].attributes[1].nodeValue;
+        
+        //comparar 
+        if(property.getValue() == value){
+          
+          //finalizar página 
+          if(action == "endPage"){
+            console.log("Test encerra pagina");
+            //
+            ModuleFable.getBook().nextPage();
+          }
+          if(action == "changeState"){
+            console.log("Test muda estado");
+            //
+            UtilsFunction.getAgentAndChangeState(agent[0].id, target);
+          }
+          if(action == "changePage"){
+            //
+            res = shout_target.split('#');
+            var parameterOne = res[0];//page
+            var parameterTwo = res[1];//number
+            ModuleFable.getBook().changePage(parseInt(parameterTwo));
+          }
+        }//encerra o onClick
+      })
+
+    }
+  }
+})
+
+/*
+* ------------- CLASS TEST -------------------------------
+*/
+app.factory('TestFactory',function(){
+  return function(element){
+    this.element = element;
+
+    this.compareValues = function(property, value){
+      return (property.getValue() == value);
+    }
+
+  }
+})
+
+/*
+* ------------- DIRETIVA SET -------------------------------
+*/
+app.directive('set',function(){
   return{
     restrict: 'E',
     link: function(scope, elem, attr, ctrl){
-      var prop = new Property(attr.name, attr.value);
+      var onClick = Elements.searchElement(elem, "state");
+      var new_value = attr.value;
+      
+      
+      onClick.bind('click', function(){
+        //pega a property
+        var property = Elements.getProperty(attr.target);
+        console.log(property);
+      
+        console.log("troquei");
+        property.setValue(new_value);
+      })
+    }
+  }
+})
+
+/*
+* ------------- DIRETIVA BOARD -------------------------------
+*/
+app.directive('board',function(){
+  return{
+    restrict: 'E',
+    link: function(scope, elem, attr, ctrl){
+      //estilização da board
+      if(attr.fontSize == undefined)
+        attr.fontSize = "25px";
+
+      elem.css({
+        position: 'absolute',
+        color: 'black',
+        'background-color': 'white', 
+        'border-radius': '10px',
+        'font-size': attr.fontSize,
+        padding: '5px',
+        'text-align': 'justify',
+      })
+    }
+  }
+})
+
+/*
+* ------------- DIRETIVAS X, Y, WIDTH, HEIGHT -------------------------------
+*/
+app.directive('left',function(){
+  return{
+    restrict: 'A',
+    link: function(scope, elem, attr, ctrl){
+      elem.css({
+        position: 'absolute', 
+        left: attr.left+'px'
+      })
+    }
+  }
+})
+
+app.directive('top',function(){
+  return{
+    restrict: 'A',
+    link: function(scope, elem, attr, ctrl){
+      elem.css({
+        position: 'absolute', 
+        top: attr.top+'px'
+      })
+    }
+  }
+})
+
+app.directive('width',function(){
+  return{
+    restrict: 'A',
+    link: function(scope, elem, attr, ctrl){
+      elem.css({
+        width: attr.width+'px'
+      })
+    }
+  }
+})
+
+app.directive('height',function(){
+  return{
+    restrict: 'A',
+    link: function(scope, elem, attr, ctrl){
+      elem.css({
+        height: attr.height+'px'
+      })
+    }
+  }
+})
+
+app.directive('fontSize',function(){
+  return{
+    restrict: 'A',
+    link: function(scope, elem, attr, ctrl){
+      elem.css({ 
+        fontSize: attr.fontSize+'px'
+      })
+    }
+  }
+})
+
+app.directive('fontColor',function(){
+  return{
+    restrict: 'A',
+    link: function(scope, elem, attr, ctrl){
+      elem.css({ 
+        color: attr.fontColor
+      })
+    }
+  }
+})
+
+
+
+/*
+* ------------- CLASS PROPERTY -------------------------------
+*/
+app.factory('PropertyFactory', function(){  
+  
+  return function(id, value) {
+        this.id = id;
+        this.value = value;
+
+        this.setValue = function(value){
+          console.log("entramos aqui");
+          this.value = value;
+        };
+
+        this.getValue = function(){
+          return this.value;
+        };
+
+  };
+  
+});
+
+app.directive('property',function(PropertyFactory){
+  return{
+    restrict: 'E',
+    link: function(scope, elem, attr, ctrl){
+      var prop = new PropertyFactory(attr.name, attr.value);
       console.log(prop);
       Elements.addProperty(prop);
     }
@@ -589,31 +894,12 @@ app.directive('property',function(){
 });
 
 /*
-* Classe Property
-*/
-var Property = (function(){
-  function Property(id, value){
-    this.id = id;
-    this.value = value;
-  }
-
-  Property.prototype.setValue = function(value){
-    this.value = value;
-  }
-
-  Property.prototype.getValue = function(){
-    return this.value;
-  }
-
-  return Property;
-}());
-
-/*
-* Diretiva set
+* ------------- DIRETIVA SET -------------------------------
 * - muda um valor de uma propriedade
 */
 app.directive('set',function(){
   return{
+    
     restrict: 'E',
     link: function(scope, elem, attr, ctrl){
       
@@ -629,249 +915,114 @@ app.directive('set',function(){
   }
 });
 
+
 /*
-* Classe Alert
+* ------------- CLASS ALERT -------------------------------
 * - chamado dentro de um ontouch ele lança um aviso na tela
 */
-var Alert = (function(){
-  function Alert(text, elem){
+app.factory('AlertFactory',function(){
+  return function(text, elem, agentNameState){
+    //
     this.text = text;
     this.element = elem;
+    this.agentNameState = agentNameState;
     this.flag = true;
     elem[0].style.display = "none";
-  }
-
-  Alert.prototype.createAlert = function($animate){
-    //estilizando
-    $animate.addClass(this.element,'element-animation-fadeIn');
-    this.element.css({
-      display: 'none',
-      position: 'absolute',
-      background: '#bdbdbd', 
-      'font-size': '30px',
-      padding: '5px',
-      'text-align': 'justify',
-      left: '50px',
-      top: '10px',
-      width:'300px',
-      'border-radius': '10px',
-      'border': '2px solid #455a64',
-      'z-index': '1'
-    })
-  }
-
-  Alert.prototype.actionAlert = function(){
-    if(this.flag){
-      this.element[0].style.display = "block";
-      this.flag = false;
-      console.log("mostrar")
-    }else{
-      this.element[0].style.display = "none";
-      this.flag = true;
-      console.log("nao mostrar")
-    } 
-  }
-
-  return Alert;
-}());
-
-//<alert>
-app.directive('alert',function($animate){
-  return{
-    restrict: 'E',
-    link: function(scope, elem, attr, ctrl){
-        var flag = {value:true,button:false};
-        var text = elem[0].childNodes[0].data;
-        var alert = new Alert(text,elem);
-        alert.createAlert($animate);
-
-
-        var onTouch = elem.parent();
-        onTouch.bind('click',function(){
-          alert.actionAlert();
-        });
-    }
-  }
-})
-
-/*
-* Diretiva test
-*/
-app.directive('test',function($animate){
-  return{
-    restrict: 'E',
-    link: function(scope, elem, attr){
-
-      //pega o on-touch
-      var onClick = Elements.searchElement(elem,"on-touch");
-      //gera mensagem
-      var alert = new Alert("text",elem);
-      alert.createAlert($animate);
-      //
-      var test = new Test(elem);  
-      onClick.bind('click',function(){
-        //pegar a property
-        var property = Elements.getProperty(attr.target);
-        //pegar value
-        var value = attr.value;
-        //pegar shout
-        var shout = elem[0].children;
-        var execute = shout[0].attributes[0].nodeValue;
-        var shout_target = shout[0].attributes[1].nodeValue;
-        console.log("execute "+execute+" target"+shout_target);
-        //comparar
-        if( test.compareValues(property, value) ){
-          //ações  
-
-          //finalizar página 
-          if(execute == "endPage"){
-            console.log("Test encerra pagina");
-            //
-            ModuleFable.getBook().nextPage();
-          }
-          if(execute == "changeState"){
-            console.log("Test muda estado");
-            //
-            res = shout_target.split('#');
-            var parameterOne = res[0];//agent / page
-            var parameterTwo = res[1];//state / number
-
-            test.changeState(parameterOne, parameterTwo);
-          }
-          if(execute == "changePage"){
-            //
-            res = shout_target.split('#');
-            var parameterOne = res[0];//page
-            var parameterTwo = res[1];//number
-            ModuleFable.getBook().changePage(parseInt(parameterTwo));
-          }
-        }//encerra o onClick
-      })
-
-    }
-  }
-})
-
-/*
-* Class Test
-*/
-var Test = (function(){
-  function Test(element){
-    this.element = element;
-  }
-
-  //Recebe uma property e um value e retorna o resultado
-  Test.prototype.compareValues = function(property, value){
-    return (property.getValue() == value);
-  }
-
-  //Muda o estado de um agente dentro de um teste
-  Test.prototype.changeState = function(agent, state){
-    var agent = Elements.getAgent(agent);
-    agent.changeState(state);
-  }
-
-  return Test;
-}());
-
-//<set>
-app.directive('set',function(){
-  return{
-    restrict: 'E',
-    link: function(scope, elem, attr, ctrl){
-      var onClick = Elements.searchElement(elem, "state");
-      var new_value = attr.value;
-      
-      onClick.bind('click', function(){
-        //pega a property
-        var property = Elements.getProperty(attr.target);
-        console.log(property);
-      
-        console.log("troquei");
-        property.setValue(new_value);
-      })
-    }
-  }
-})
-
-//<board>
-app.directive('board',function(){
-  return{
-    restrict: 'E',
-    link: function(scope, elem, attr, ctrl){
-      //estilização da board
-      if(attr.fontSize == undefined)
-        attr.fontSize = "25px";
-      elem.css({
+    //
+    this.createAlert = function($animate){
+      //estilizando
+      $animate.addClass(this.element,'animate fadeIn');
+      this.element.css({
+        display: 'none',
         position: 'absolute',
-        background: attr.color, 
-        'border-radius': '10px',
-        'font-size': attr.fontSize,
+        background: '#bdbdbd', 
+        'font-size': '30px',
         padding: '5px',
         'text-align': 'justify',
+        left: '50px',
+        top: '10px',
+        width:'300px',
+        'border-radius': '10px',
+        'border': '2px solid #455a64',
+        'z-index': '1'
       })
     }
-  }
-})
 
-//diretivas de posição
-app.directive('x',function(){
-  return{
-    restrict: 'A',
-    link: function(scope, elem, attr, ctrl){
-      elem.css({
-        position: 'absolute', 
-        left: attr.x+'px'
-      })
+    this.actionAlert = function(){
+      console.log("entrei no actionAlert");
+      if(this.flag){
+        this.element[0].style.display = "block";
+        this.flag = false;
+        console.log("mostrar")
+      }else{
+        this.element[0].style.display = "none";
+        this.flag = true;
+        console.log("nao mostrar")
+      }
+      return flag; 
     }
-  }
-})
 
-app.directive('y',function(){
-  return{
-    restrict: 'A',
-    link: function(scope, elem, attr, ctrl){
-      elem.css({
-        position: 'absolute', 
-        top: attr.y+'px'
-      })
-    }
   }
-})
+});
 
-app.directive('width',function(){
+/*
+* ------------- DIRETIVA ALERT -------------------------------
+*/
+app.directive('alert',function($animate,AlertFactory){
   return{
-    restrict: 'A',
+    restrict: 'E',
     link: function(scope, elem, attr, ctrl){
-      elem.css({
-        position: 'absolute', 
-        width: attr.width+'px'
-      })
-    }
-  }
-})
+        var text = elem[0].childNodes[0].data;
+        
+        var ontouch = elem.parent();
+        var state = ontouch.parent()[0].id;
+        var agent = ontouch.parent().parent()[0].id;
+        var agentNameState = agent + state ;
 
-app.directive('height',function(){
-  return{
-    restrict: 'A',
-    link: function(scope, elem, attr, ctrl){
-      elem.css({
-        position: 'absolute', 
-        height: attr.height+'px'
-      })
+        var alert = new AlertFactory(text,elem,agentNameState);
+        elem[0].id = agentNameState;
+        alert.createAlert($animate);
+        
+        Elements.addAlert(alert);
     }
   }
 })
 
 /*
-* Diretiva draggable
+* ------------- CLASS DRAG -------------------------------
 */
-app.directive('draggable', ['$document', function($document) {
+app.factory('DragFactory',function(){
+  return function(id, elem){
+    this.id = id;
+    this.elem = elem;
+    this.top = 0;
+    this.left = 0;
+
+    this.attPosition = function(x, y){
+      this.top = y;
+      this.left = x;
+      console.log("id "+this.id);
+      console.log("x:"+this.left+" y:"+this.top);
+    }
+
+    this.getPosition = function(){
+      return{
+        x: this.left,
+        y: this.top
+      }
+    }
+  }
+});
+
+/*
+* ------------- DIRETIVA DRAGGABLE -------------------------------
+*/
+app.directive('draggable', function($document, DragFactory) {
   return {
     restrict: 'AE',
     link: function(scope, element, attr) {
-      var startX = 0, startY = 0, x = attr.x, y = attr.y;
-      var drag = new Drag(element[0].id, element);
+      var startX = 0, startY = 0, x = attr.left, y = attr.top;
+      var drag = new DragFactory(element[0].id, element);
       Elements.addDrag(drag);
 
       element.on('mousedown', function(event) {
@@ -910,44 +1061,16 @@ app.directive('draggable', ['$document', function($document) {
       }
     }
   };
-}]);
+});
 
 /*
-*Classe Drag
+* ------------- DIRETIVA DETECT -------------------------------
 */
-var Drag = (function(){
-  function Drag(id,elem){
-    this.id = id;
-    this.elem = elem;
-    this.top = 0;
-    this.left = 0;
-  }
-
-  Drag.prototype.attPosition = function(x, y){
-    this.top = y;
-    this.left = x;
-    console.log("id "+this.id);
-    console.log("x:"+this.left+" y:"+this.top);
-  }
-
-  Drag.prototype.getPosition = function(){
-    return{
-      x: this.left,
-      y: this.top
-    }
-  }
-
-  return Drag;
-}());//fim da Classe Drag
-
-/** Diretiva detect
-*
-*/
-app.directive('detect',function(){
+app.directive('detect',function(DetectFactory){
   return{
     restrict: 'AE',
     link: function(scope, elem, attr){
-      var dect = new Detect(attr.target, attr.x, attr.y, attr.w, attr.h);
+      var dect = new DetectFactory(attr.target, attr.left, attr.top, attr.width, attr.height);
       dect.setEvent(attr.event, attr.for);
 
       if(attr.event == "changeState")
@@ -958,12 +1081,13 @@ app.directive('detect',function(){
   }
 })
 
-/*Classe Detect
+/* ------------- DIRETIVA DETECT -------------------------------
 * - Responsável por detectar elementos arrastáveis
 * - Gera uma ação quando o elemento está sobre a área informada
 */
-var Detect = (function(){
-  function Detect(id, x, y, w, h,agent){
+
+app.factory('DetectFactory',function(){
+  return function(id, x, y, w, h,agent){
     this.id = id;
     this.value = false;
     this.x = x;
@@ -973,90 +1097,75 @@ var Detect = (function(){
     this.action = "";
     this.event = "";
     this.agent = "";
-  }
 
-  Detect.prototype.setEvent = function(event, action){
-    this.action = action;
-    this.event = event;
-  }
-
-  Detect.prototype.setAgent = function(agent){
-    this.agent = agent;
-  }
-
-  Detect.prototype.startEvent = function(event,action,param1){
-    if(this.value){
-      if(this.event == "changePage")
-        ModuleFable.getBook().changePage(parseInt(this.action));
-      if(this.event == "changeState")
-        var agent = Elements.getAgent(this.agent);
-        agent.changeState(this.action);
+    this.setEvent = function(event, action){
+      this.action = action;
+      this.event = event;
     }
-  }
 
-  Detect.prototype.getValue = function(){
-    console.log("dect: "+ this.value);
-    return this.value;
-  }
-
-  Detect.prototype.checkArea = function (){
-    var drag = Elements.getDrag(this.id);
-    var position = drag.getPosition();
-    var x = this.x < position.x && position.x <(this.x + this.width);
-    var y = this.y < position.y && position.y <(this.y + this.height);
-    if(x && y){
-      this.value = true;
+    this.setAgent = function(agent){
+      this.agent = agent;
     }
+
+    this.startEvent = function(event,action,param1){
+      if(this.value){
+        if(this.event == "changePage")
+          ModuleFable.getBook().changePage(parseInt(this.action));
+        if(this.event == "changeState")
+          var agent = Elements.getAgent(this.agent);
+          agent.changeState(this.action);
+      }
+    }
+
+    this.getValue = function(){
+      console.log("dect: "+ this.value);
+      return this.value;
+    }
+
+    this.checkArea = function (){
+      var drag = Elements.getDrag(this.id);
+      var position = drag.getPosition();
+      var x = this.x < position.x && position.x <(this.x + this.width);
+      var y = this.y < position.y && position.y <(this.y + this.height);
+      if(x && y){
+        this.value = true;
+      }
+    }
+
   }
+})
 
-  return Detect;
-}());//fim da Classe Detect
-
-
-/*class Transition
+/* ------------- CLASS TRANSITION -------------------------------
 * - Responsável por efeitos de transições
 * - em elementos, imagens
 */
-var Transition = (function(){
-	function Transition(elem,animateCss){
-		this.elem = elem;
-		this.animateCss = animateCss;
-		this.css = null;
-	}
+app.factory('TransitionFactory',function(){
+  return function(elem,animateCss){
+    this.elem = elem;
+    this.animateCss = animateCss;
+    this.css = null;
 
-	Transition.prototype.setStyle = function(type){
-		var classType;
-		if(type == "fadeOut")
-			classType = "element-animation-fadeOut";
-		else if(type == "fadeIn")
-			classType = "element-animation-fadeIn";
-		else if(type == "tada")
-			classType = "element-animation-tada";
-		else if(type == "bounce")
-			classType = "element-animation-bounce";
-		else if(type == "scaling")
-			classType = "element-animation-scaling";
+    this.setStyle = function(type){
+      this.css = this.animateCss(this.elem,{
+        addClass: type
+      })
+    }
 
-		this.css = this.animateCss(this.elem,{
-			addClass: classType
-		})
-	}
+    this.startAnimation = function(){
+      this.css.start();
+    }
 
-	Transition.prototype.startAnimation = function(){
-		this.css.start();
-	}
-
-	return Transition;
-}()); //fim da Class Trasition
+  }
+})
 
 /* 
-* Diretiva transition
+* ------------- DIRETIVA TRANSITION -------------------------------
 */
-app.directive('transition',function($animateCss){
+app.directive('transition',function($animateCss, TransitionFactory){
   return{
     restrict: 'A',
     link: function(scope, elem, attr, ctrl){
-      var transition = new Transition(elem, $animateCss);
+      var transition = new TransitionFactory(elem, $animateCss);
       transition.setStyle(attr.transition);
 
       transition.startAnimation();
